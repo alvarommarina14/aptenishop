@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Local Development
 
-## Getting Started
-
-First, run the development server:
+To run the project locally:
 
 ```bash
+# 1. Install dependencies
+npm install
+
+# 2. Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open `http://localhost:3000` in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Make sure to create a `.env` file with the required environment variables (see `.env.example` if available).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## ✅ Project Rules
 
-To learn more about Next.js, take a look at the following resources:
+### 1. Branch Naming
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Use the following convention when creating branches:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+(feature|fix)/taskName
+```
 
-## Deploy on Vercel
+Examples:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `feature/addProductPage`
+- `fix/cartDiscountBug`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> Use `feature/` for new features and `fix/` for bug fixes or patches.
+
+---
+
+### 2. Pull Requests (PRs)
+
+- All work must go through a **Pull Request**.
+- **Target branch should always be `staging`.**
+- Never merge directly to `main`.
+- PRs must be reviewed and approved before merging.
+
+---
+
+### 3. Commit & Staging Guidelines
+
+- Only stage and commit **what belongs to your current task**.
+- Avoid committing unrelated changes like:
+  - Formatting/indentation adjustments (unless necessary for the task)
+  - Console logs
+  - Unused variables or commented-out code
+
+> Keep each PR clean and focused to make reviewing easy and safe.
+
+---
