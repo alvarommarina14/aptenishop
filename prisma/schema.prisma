@@ -56,3 +56,18 @@ model VariantAttribute {
   attribute   Attribute  @relation(fields: [attributeId], references: [id])
 }
 
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
