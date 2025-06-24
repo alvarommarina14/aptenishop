@@ -10,20 +10,20 @@ datasource db {
 }
 
 model Product {
-  id              Int             @id @default(autoincrement())
-  name            String
-  description     String
-  productType     String
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  variants        Variant[]
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  productType String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  variants    Variant[]
 }
 
 model VariantImage {
-  id         Int       @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   url        String
-  variant    Variant   @relation(fields: [variantId], references: [id])
   variantId  Int
+  variant    Variant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
 }
 
 model Variant {
@@ -33,8 +33,8 @@ model Variant {
   compareAtPrice  Float?
   stock           Int
   isAvailable     Boolean            @default(true)
-  product         Product            @relation(fields: [productId], references: [id])
   productId       Int
+  product         Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
   images          VariantImage[]
   attributes      VariantAttribute[]
 }
@@ -48,9 +48,9 @@ model Attribute {
 model VariantAttribute {
   id          Int        @id @default(autoincrement())
   value       String
-  variant     Variant    @relation(fields: [variantId], references: [id])
   variantId   Int
-  attribute   Attribute  @relation(fields: [attributeId], references: [id])
+  variant     Variant    @relation(fields: [variantId], references: [id], onDelete: Cascade)
   attributeId Int
+  attribute   Attribute  @relation(fields: [attributeId], references: [id])
 }
 

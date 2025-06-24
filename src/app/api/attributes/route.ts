@@ -5,24 +5,11 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const products = await prisma.product.findMany({
-      include: {
-        variants: {
-          include: {
-            images: true,
-            attributes: {
-              include: {
-                attribute: true,
-              },
-            },
-          },
-        },
-      },
-    });
-    if (!products) {
-      return NextResponse.json({ message: "No hay productos" }, { status: 404 });
+    const attribute = await prisma.attribute.findMany();
+    if (!attribute) {
+      return NextResponse.json({ message: "No hay atributos" }, { status: 404 });
     }
-    return NextResponse.json(products);
+    return NextResponse.json(attribute);
   } catch (error) {
     console.error("Error fetching products:", error);
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
