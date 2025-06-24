@@ -14,6 +14,7 @@ model Product {
   name        String
   description String
   productType String
+  brand       String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   variants    Variant[]

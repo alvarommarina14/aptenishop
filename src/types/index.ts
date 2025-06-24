@@ -35,6 +35,7 @@ export interface Product {
   name: string;
   description: string;
   productType: string;
+  brand?: string | null;
   createdAt: Date;
   updatedAt: Date;
   variants: Variant[];
