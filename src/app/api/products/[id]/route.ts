@@ -1,28 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@/generated/prisma";
+import { prisma } from "@/lib/prisma";
+import { GetProductById } from "@/lib/services/products";
 import { updateProductSchema } from "@/lib/validations/productSchema";
-
-const prisma = new PrismaClient();
 
 export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const id = parseInt(params.id);
-
-    const product = await prisma.product.findUnique({
-      where: { id },
-      include: {
-        variants: {
-          include: {
-            images: true,
-            attributes: {
-              include: {
-                attribute: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    const product = await GetProductById(parseInt(params.id));
 
     if (!product) {
       return NextResponse.json({ message: "Producto no encontrado" }, { status: 404 });

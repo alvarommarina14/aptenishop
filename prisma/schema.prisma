@@ -14,6 +14,7 @@ model Product {
   name        String
   description String
   productType String
+  brand       String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   variants    Variant[]
@@ -22,6 +23,7 @@ model Product {
 model VariantImage {
   id         Int      @id @default(autoincrement())
   url        String
+  altText    String?
   variantId  Int
   variant    Variant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
 }

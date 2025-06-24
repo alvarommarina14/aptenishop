@@ -11,6 +11,7 @@ export const createVariantSchema = z.object({
     .array(
       z.object({
         url: z.string().url("Image URL must be valid"),
+        altText: z.string().min(3, "Alt text must have at least 3 characters").optional(),
       }),
     )
     .optional(),

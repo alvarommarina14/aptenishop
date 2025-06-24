@@ -1,25 +1,11 @@
 import { NextResponse, NextRequest } from "next/server";
-import { PrismaClient } from "@/generated/prisma";
+import { prisma } from "@/lib/prisma";
+import { GetAllProducts } from "@/lib/services/products";
 import { createProductSchema } from "@/lib/validations/productSchema";
-
-const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const products = await prisma.product.findMany({
-      include: {
-        variants: {
-          include: {
-            images: true,
-            attributes: {
-              include: {
-                attribute: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    const products = await GetAllProducts();
     if (!products) {
       return NextResponse.json({ message: "No hay productos" }, { status: 404 });
     }
