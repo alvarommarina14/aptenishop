@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@/generated/prisma";
+import { updateProductSchema } from "@/lib/validations/productSchema";
 
 const prisma = new PrismaClient();
 
@@ -35,13 +36,18 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const data = await req.json();
+    const body = await req.json();
+    const result = updateProductSchema.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json({ errors: result.error.flatten().fieldErrors }, { status: 400 });
+    }
 
     const id = parseInt(params.id);
 
     const updated = await prisma.product.update({
       where: { id },
-      data,
+      data: result.data,
     });
 
     return NextResponse.json(updated);
