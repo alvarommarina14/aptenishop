@@ -16,3 +16,21 @@ export async function GetAllProducts() {
     },
   });
 }
+
+export async function GetProductById(id: number) {
+  return prisma.product.findUnique({
+    where: { id },
+    include: {
+      variants: {
+        include: {
+          images: true,
+          attributes: {
+            include: {
+              attribute: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
