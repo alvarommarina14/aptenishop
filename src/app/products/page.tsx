@@ -1,27 +1,17 @@
 import { GetAllProducts } from "@/lib/services/products";
+import ProductCard from "@/components/product/Card";
 
 export default async function Products() {
   const products = await GetAllProducts();
 
   return (
     <main>
-      <div>
-        <h1>Products Page</h1>
+      <h1>Products Page</h1>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => {
           return (
-            <div key={product.id} className="my-10">
-              <p>{product.name}</p>
-              <p>{product.productType}</p>
-              <p>{product.description}</p>
-              {product.variants.map((variant) => {
-                return (
-                  <div key={variant.id} className="mt-4 font-bold ml-10">
-                    <p>{variant.price}</p>
-                    <p>{variant.isAvailable}</p>
-                    <p>{variant.sku}</p>
-                  </div>
-                );
-              })}
+            <div key={product.id} className="max-w-[350px]">
+              <ProductCard product={product} />
             </div>
           );
         })}
