@@ -40,3 +40,19 @@ export interface Product {
   updatedAt: Date;
   variants: Variant[];
 }
+
+export interface TableColumn {
+  key: string;
+  label: string;
+  hide: boolean;
+}
+
+export interface ImageData {
+  url: string;
+  altText?: string;
+}
+
+export interface RowData {
+  image?: ImageData;
+  [key: string]: string | ImageData | undefined;
+}

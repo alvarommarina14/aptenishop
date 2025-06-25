@@ -8,9 +8,9 @@ type propTypes = {
 
 export default function NavLinks({ closeMenu }: propTypes) {
   const linkClass =
-    "px-4 py-4 block text-start md:text-center cursor-pointer text-white transition-all flex gap-3 md:hover:bg-white md:hover:text-neutral-800 group";
+    "px-4 py-4 block text-start md:text-center cursor-pointer text-gray-100 transition-all flex gap-3 md:hover:bg-gray-100 md:hover:text-neutral-800 group";
 
-  const iconLinkClass = "text-white md:group-hover:text-neutral-800 transition-all";
+  const iconLinkClass = "text-gray-100 md:group-hover:text-neutral-800 transition-all";
 
   const links = [
     { href: "/admin", label: "Home", icon: House },
