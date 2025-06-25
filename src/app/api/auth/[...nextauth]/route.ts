@@ -2,7 +2,8 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 
-const authOptions = {
+export const authOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -15,9 +16,6 @@ const authOptions = {
           where: { email: credentials?.email || "" },
         });
         if (!userFound) throw new Error("No user found");
-
-        console.log(credentials?.password);
-        console.log(userFound.password);
 
         const matchPassword = credentials?.password === userFound.password;
 
