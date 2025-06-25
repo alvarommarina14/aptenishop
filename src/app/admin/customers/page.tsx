@@ -1,7 +1,12 @@
+import PageTitle from "@/components/admin/PageTitle";
+import { User } from "lucide-react";
+
 export default function Customers() {
+  const titleData = { title: "Customers", icon: User };
+
   return (
-    <div>
-      <h1>Customers page</h1>
+    <div className="p-4">
+      <PageTitle data={titleData} />
     </div>
   );
 }
