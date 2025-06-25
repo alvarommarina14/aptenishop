@@ -1,4 +1,5 @@
 import { TableColumn, RowData } from "@/types";
+import Link from "next/link";
 
 type TableProps = {
   columns: TableColumn[];
@@ -27,27 +28,35 @@ export default function Table({ columns, rows, acceptImage }: TableProps) {
           {rows.map((row, rowIndex) => (
             <tr key={rowIndex} className="hover:bg-gray-50">
               {columns.map((col, colIndex) => {
-                if (!col.hide) {
-                  const cell = row[col.key];
-                  const cellValue = typeof cell === "string" ? cell : "";
+                if (col.hide) return null;
+                const cell = row[col.key];
+                const cellValue = typeof cell === "string" ? cell : "";
 
-                  return (
-                    <td key={col.key} className="px-6 py-4">
-                      {acceptImage && colIndex === 0 && row.image ? (
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={row.image.url}
-                            alt={row.image.altText || ""}
-                            className="h-10 w-10 rounded object-cover"
-                          />
-                          <span>{cellValue}</span>
-                        </div>
-                      ) : (
-                        cellValue
-                      )}
-                    </td>
-                  );
-                }
+                return (
+                  <td key={col.key} className="px-6 py-4">
+                    {colIndex === 0 ? (
+                      <Link
+                        href={`/admin/products/${row.id}`}
+                        className="flex items-center gap-3 hover:underline text-inherit"
+                      >
+                        {acceptImage && row.image ? (
+                          <>
+                            <img
+                              src={row.image.url}
+                              alt={row.image.altText || ""}
+                              className="h-10 w-10 rounded object-cover"
+                            />
+                            <span>{cellValue}</span>
+                          </>
+                        ) : (
+                          cellValue
+                        )}
+                      </Link>
+                    ) : (
+                      cellValue
+                    )}
+                  </td>
+                );
               })}
             </tr>
           ))}
