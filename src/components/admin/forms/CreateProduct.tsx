@@ -6,7 +6,7 @@ import { CreateProductForm } from "@/types";
 import { createProduct } from "@/lib/actions/products";
 import { useRouter } from "next/navigation";
 
-export default function ProductForm() {
+export default function ProductPageCreateForm() {
   const {
     register,
     handleSubmit,
