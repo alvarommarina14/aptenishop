@@ -5,9 +5,10 @@ type TableProps = {
   columns: TableColumn[];
   rows: RowData[];
   acceptImage?: boolean;
+  redirect: string;
 };
 
-export default function Table({ columns, rows, acceptImage }: TableProps) {
+export default function Table({ columns, rows, acceptImage, redirect }: TableProps) {
   return (
     <div className="overflow-x-auto rounded-xl shadow-md border border-gray-200">
       <table className="min-w-full divide-y divide-gray-200 text-sm text-left text-gray-700 bg-white">
@@ -36,7 +37,7 @@ export default function Table({ columns, rows, acceptImage }: TableProps) {
                   <td key={col.key} className="px-6 py-4">
                     {colIndex === 0 ? (
                       <Link
-                        href={`/admin/products/${row.id}`}
+                        href={`${redirect}/${row.id}`}
                         className="flex items-center gap-3 hover:underline text-inherit"
                       >
                         {acceptImage && row.image ? (

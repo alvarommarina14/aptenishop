@@ -27,7 +27,7 @@ export default async function Products() {
           Add product
         </Link>
       </div>
-      <Table acceptImage columns={columns} rows={rows} />
+      <Table acceptImage columns={columns} rows={rows} redirect={`/admin/products`} />
     </div>
   );
 }

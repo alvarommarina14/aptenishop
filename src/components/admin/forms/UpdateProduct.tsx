@@ -37,6 +37,12 @@ export default function ProductPageUpdateForm({ productData }: propType) {
     reset,
   } = useForm({
     resolver: zodResolver(updateProductSchema),
+    defaultValues: {
+      name: productData.name,
+      description: productData.description,
+      productType: productData.productType,
+      brand: productData.brand ?? undefined,
+    },
   });
 
   const onSubmit = async (data: CreateProductForm) => {
@@ -65,7 +71,6 @@ export default function ProductPageUpdateForm({ productData }: propType) {
           </label>
           <input
             {...register("name")}
-            defaultValue={productData.name}
             id="name"
             type="text"
             className="border rounded-md border-neutral-500 text-sm p-2 pl-3"
@@ -79,7 +84,6 @@ export default function ProductPageUpdateForm({ productData }: propType) {
           </label>
           <textarea
             {...register("description")}
-            defaultValue={productData.description}
             id="description"
             rows={10}
             cols={60}
@@ -94,7 +98,6 @@ export default function ProductPageUpdateForm({ productData }: propType) {
           </label>
           <input
             {...register("productType")}
-            defaultValue={productData.productType}
             id="productType"
             type="text"
             className="border rounded-md border-neutral-500 text-sm p-2 pl-3"
@@ -108,7 +111,6 @@ export default function ProductPageUpdateForm({ productData }: propType) {
           </label>
           <input
             {...register("brand")}
-            defaultValue={productData.brand ? productData.brand : undefined}
             id="brand"
             type="text"
             className="border rounded-md border-neutral-500 text-sm p-2 pl-3"
@@ -127,7 +129,9 @@ export default function ProductPageUpdateForm({ productData }: propType) {
           </span>
           Add options like size or color
         </Link>
-        {variants && <Table acceptImage columns={columns} rows={rows} />}
+        {variants && (
+          <Table acceptImage columns={columns} rows={rows} redirect={`/admin/products/${productData.id}/variants`} />
+        )}
       </div>
 
       <button
