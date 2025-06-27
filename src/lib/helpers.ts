@@ -43,12 +43,16 @@ const getStockSummary = (obj: unknown) => {
     : "";
 };
 
-export const generateRows = (data: unknown[], columns: TableColumn[], includeImage = false) =>
+export const generateRows = (data: unknown[], columns: TableColumn[], includeImage = false, accumulateStock = true) =>
   data.map((item) => {
     const row: RowData = {};
 
     for (const { key } of columns) {
-      row[key] = key === "stock" ? getStockSummary(item) : findValueByKey(item, key) ?? "";
+      if (key === "stock") {
+        row[key] = accumulateStock ? getStockSummary(item) : findValueByKey(item, "stock") ?? "";
+      } else {
+        row[key] = findValueByKey(item, key) ?? "";
+      }
     }
 
     if (includeImage) {

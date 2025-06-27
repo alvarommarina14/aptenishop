@@ -4,11 +4,11 @@ import { Tag } from "lucide-react";
 import ProductPageUpdateForm from "@/components/admin/forms/UpdateProduct";
 
 type Props = {
-  params: { id: string };
+  params: { productId: string };
 };
 
 export default async function Product({ params }: Props) {
-  const product = await GetProductById(parseInt(params.id));
+  const product = await GetProductById(parseInt(params.productId));
 
   if (!product) {
     return <p>Product not found</p>;

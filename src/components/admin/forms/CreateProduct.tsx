@@ -33,7 +33,12 @@ export default function ProductPageCreateForm() {
           <label htmlFor="name" className="text-sm text-neutral-700">
             Title
           </label>
-          <input {...register("name")} id="name" type="text" className="border rounded-md border-neutral-500 p-1" />
+          <input
+            {...register("name")}
+            id="name"
+            type="text"
+            className="border rounded-md border-neutral-500 text-sm p-2 pl-3"
+          />
           {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
         </div>
 
@@ -46,7 +51,7 @@ export default function ProductPageCreateForm() {
             id="description"
             rows={10}
             cols={60}
-            className="border rounded-md border-neutral-500 p-1 resize-none"
+            className="border rounded-md border-neutral-500 text-sm p-2 pl-3 resize-none"
           />
           {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
         </div>
@@ -59,7 +64,7 @@ export default function ProductPageCreateForm() {
             {...register("productType")}
             id="productType"
             type="text"
-            className="border rounded-md border-neutral-500 p-1"
+            className="border rounded-md border-neutral-500 text-sm p-2 pl-3"
           />
           {errors.productType && <p className="text-red-500 text-sm">{errors.productType.message}</p>}
         </div>
@@ -68,7 +73,12 @@ export default function ProductPageCreateForm() {
           <label htmlFor="brand" className="text-sm text-neutral-700">
             Brand
           </label>
-          <input {...register("brand")} id="brand" type="text" className="border rounded-md border-neutral-500 p-1" />
+          <input
+            {...register("brand")}
+            id="brand"
+            type="text"
+            className="border rounded-md border-neutral-500 text-sm p-2 pl-3"
+          />
         </div>
       </div>
 
