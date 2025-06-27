@@ -61,5 +61,6 @@ export interface CreateProductForm {
   name: string;
   description: string;
   productType: string;
-  brand?: string | null;
+  brand?: string | undefined;
+  id?: number | undefined;
 }
