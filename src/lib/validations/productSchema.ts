@@ -30,7 +30,7 @@ export const createProductSchema = z.object({
           .optional(),
       }),
     )
-    .min(1, "At least one variant is required"),
+    .optional(),
 });
 
 export const updateProductSchema = createProductSchema.partial();

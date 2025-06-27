@@ -56,3 +56,10 @@ export interface RowData {
   image?: ImageData;
   [key: string]: string | ImageData | undefined;
 }
+
+export interface CreateProductForm {
+  name: string;
+  description: string;
+  productType: string;
+  brand?: string | null;
+}
