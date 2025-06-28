@@ -1,9 +1,15 @@
-export async function uploadImagesToCloudinary(files: File[] | null) {
-  if (!files) return;
+type UploadedImage = {
+  url: string;
+  publicId: string;
+};
+
+export async function uploadImagesToCloudinary(files: File[] | null): Promise<UploadedImage[] | undefined> {
+  if (!files || files.length === 0) return;
+
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
-  const urls: string[] = [];
+  const images: UploadedImage[] = [];
 
   for (const file of files) {
     const formData = new FormData();
@@ -18,8 +24,12 @@ export async function uploadImagesToCloudinary(files: File[] | null) {
     if (!res.ok) throw new Error("Cloudinary upload failed");
 
     const data = await res.json();
-    urls.push(data.secure_url);
+
+    images.push({
+      url: data.secure_url,
+      publicId: data.public_id,
+    });
   }
 
-  return urls;
+  return images;
 }

@@ -2,6 +2,7 @@ export interface VariantImage {
   id: number;
   url: string;
   variantId: number;
+  publicId: string;
   altText?: string | null;
 }
 

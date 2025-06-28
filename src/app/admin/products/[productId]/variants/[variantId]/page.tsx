@@ -49,7 +49,9 @@ export default async function VariantPage({ params }: PropsType) {
               <Link
                 key={variant.id}
                 href={`/admin/products/${product.id}/variants/${variant.id}`}
-                className="p-2 hover:bg-gray-100 flex items-center gap-2"
+                className={`p-2 hover:bg-gray-100 flex items-center gap-2 text-sm ${
+                  variant.id == activeVariant[0].id && "bg-gray-100 font-semibold"
+                }`}
               >
                 {variant.images.length > 0 && (
                   <img

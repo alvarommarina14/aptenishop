@@ -1,4 +1,4 @@
-export async function createVariantImages(data: { url: string; variantId: number }[] | undefined) {
+export async function createVariantImages(data: { url: string; publicId: string; variantId: number }[] | undefined) {
   try {
     const res = await fetch(`/api/variant-images`, {
       method: "POST",

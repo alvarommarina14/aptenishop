@@ -41,7 +41,7 @@ export default function VariantPageCreateForm({ productReference }: PropsType) {
 
     try {
       const files = images ? (images as File[]) : null;
-      const uploadedImageUrls = await uploadImagesToCloudinary(files);
+      const uploadedImages = await uploadImagesToCloudinary(files);
 
       const dataCompleted = {
         ...restData,
@@ -50,12 +50,17 @@ export default function VariantPageCreateForm({ productReference }: PropsType) {
       };
 
       const variant = await createVariant(dataCompleted);
-      const imagesFormatted = uploadedImageUrls?.map((url) => ({
-        url,
+
+      const imagesFormatted = uploadedImages?.map((img) => ({
+        url: img.url,
+        publicId: img.publicId,
         variantId: parseInt(variant.id),
       }));
 
-      if (uploadedImageUrls) await createVariantImages(imagesFormatted);
+      if (imagesFormatted?.length) {
+        await createVariantImages(imagesFormatted);
+      }
+
       router.push(`/admin/products/${productReference.productId}/variants/${variant.id}`);
     } catch (error) {
       setIsLoading(false);
