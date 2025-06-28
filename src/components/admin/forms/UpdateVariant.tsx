@@ -1,36 +1,42 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { LoaderCircle } from "lucide-react";
 
-import { CreateVariantForm } from "@/types";
+import { CreateVariantForm, Variant } from "@/types";
 import { uploadImagesToCloudinary } from "@/lib/actions/cloudinary";
 import { createVariantImages } from "@/lib/actions/variantImages";
-import { createVariant } from "@/lib/actions/variants";
+import { updateVariant } from "@/lib/actions/variants";
 import { updateVariantSchema } from "@/lib/validations/variantSchema";
 
 import UploadFile from "@/components/admin/UploadFile";
 
 type PropsType = {
-  productReference: { productId: string };
+  productReference: number;
+  activeVariant: Variant;
 };
 
-export default function VariantPageUpdateForm({ productReference }: PropsType) {
+export default function VariantPageUpdateForm({ productReference, activeVariant }: PropsType) {
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
   const {
     register,
     setValue,
+    reset,
     watch,
     handleSubmit,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(updateVariantSchema),
+    defaultValues: {
+      price: activeVariant.price,
+      compareAtPrice: activeVariant.compareAtPrice,
+      sku: activeVariant.sku,
+      stock: activeVariant.stock,
+    },
   });
 
   const watchFiles = watch("images");
@@ -41,22 +47,28 @@ export default function VariantPageUpdateForm({ productReference }: PropsType) {
 
     try {
       const files = images ? (images as File[]) : null;
-      const uploadedImageUrls = await uploadImagesToCloudinary(files);
+      const uploadedImages = await uploadImagesToCloudinary(files);
 
       const dataCompleted = {
         ...restData,
         isAvailable: data.stock > 0,
-        productId: parseInt(productReference.productId),
+        productId: productReference,
       };
 
-      const variant = await createVariant(dataCompleted);
-      const imagesFormatted = uploadedImageUrls?.map((url) => ({
-        url,
+      const variant = await updateVariant(dataCompleted, activeVariant.id);
+
+      const imagesFormatted = uploadedImages?.map((img) => ({
+        url: img.url,
+        publicId: img.publicId,
         variantId: parseInt(variant.id),
       }));
 
-      if (uploadedImageUrls) await createVariantImages(imagesFormatted);
-      router.push(`/admin/products/${productReference.productId}/variants/${variant.id}`);
+      if (imagesFormatted?.length) {
+        await createVariantImages(imagesFormatted);
+      }
+
+      reset(dataCompleted);
+      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       console.error(error);
