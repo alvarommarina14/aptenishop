@@ -1,4 +1,5 @@
-export async function uploadImagesToCloudinary(files: File[]) {
+export async function uploadImagesToCloudinary(files: File[] | null) {
+  if (!files) return;
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 

@@ -10,6 +10,7 @@ type UploadFileProps = {
 
 export default function UploadFile({ setValue, watchFiles }: UploadFileProps) {
   const [images, setImages] = useState<string[]>([]);
+  const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
 
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -27,8 +28,39 @@ export default function UploadFile({ setValue, watchFiles }: UploadFileProps) {
     });
   };
 
+  const toggleSelection = (index: number) => {
+    setSelectedIndexes((prev) => (prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]));
+  };
+
+  const deleteSelected = () => {
+    const newImages = images.filter((_, idx) => !selectedIndexes.includes(idx));
+    const newFiles = watchFiles?.filter((_, idx) => !selectedIndexes.includes(idx)) || [];
+
+    selectedIndexes.forEach((idx) => {
+      URL.revokeObjectURL(images[idx]);
+    });
+
+    setImages(newImages);
+    setSelectedIndexes([]);
+    setValue("images", newFiles, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
+
   return (
-    <>
+    <div className="bg-white p-4 rounded-xl mt-4">
+      <div className="flex justify-between">
+        <h2 className="font-semibold mb-2">Media</h2>
+        {selectedIndexes.length > 0 && (
+          <button
+            onClick={deleteSelected}
+            className="mb-2 text-sm cursor-pointer text-red-800 font-medium hover:underline"
+          >
+            Delete selection
+          </button>
+        )}
+      </div>
       <input id="file-upload" type="file" multiple accept="image/*" className="hidden" onChange={handleFiles} />
 
       {images.length < 1 ? (
@@ -42,21 +74,29 @@ export default function UploadFile({ setValue, watchFiles }: UploadFileProps) {
           <p className="text-xs text-neutral-700 mt-2">Only accepts images</p>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-2 mt-4 max-w-full">
-          {images.map((src, index) => (
-            <div key={index} className="border border-neutral-200 rounded-md">
-              <img src={src} alt={`preview ${index + 1}`} className="w-full h-40 object-contain rounded-md" />
-            </div>
-          ))}
+        <>
+          <div className="grid grid-cols-3 gap-2 mt-4 max-w-full">
+            {images.map((src, index) => (
+              <div key={index} className="relative border border-neutral-200 rounded-md">
+                <img src={src} alt={`preview ${index + 1}`} className="w-full h-40 object-contain rounded-md" />
+                <input
+                  type="checkbox"
+                  checked={selectedIndexes.includes(index)}
+                  onChange={() => toggleSelection(index)}
+                  className="absolute top-1 left-1 h-5 w-5 accent-neutral-800 cursor-pointer"
+                />
+              </div>
+            ))}
 
-          <label
-            htmlFor="file-upload"
-            className="h-20 w-20 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-md p-2 cursor-pointer border-dashed border-neutral-700 border"
-          >
-            <Plus className="text-neutral-700 h-4 w-4" />
-          </label>
-        </div>
+            <label
+              htmlFor="file-upload"
+              className="h-20 w-20 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-md p-2 cursor-pointer border-dashed border-neutral-700 border"
+            >
+              <Plus className="text-neutral-700 h-4 w-4" />
+            </label>
+          </div>
+        </>
       )}
-    </>
+    </div>
   );
 }

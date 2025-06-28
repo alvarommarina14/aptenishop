@@ -40,7 +40,7 @@ export default function VariantPageCreateForm({ productReference }: PropsType) {
     const { images, ...restData } = data;
 
     try {
-      const files = images as File[];
+      const files = images ? (images as File[]) : null;
       const uploadedImageUrls = await uploadImagesToCloudinary(files);
 
       const dataCompleted = {
@@ -50,12 +50,12 @@ export default function VariantPageCreateForm({ productReference }: PropsType) {
       };
 
       const variant = await createVariant(dataCompleted);
-      const imagesFormatted = uploadedImageUrls.map((url) => ({
+      const imagesFormatted = uploadedImageUrls?.map((url) => ({
         url,
         variantId: parseInt(variant.id),
       }));
 
-      await createVariantImages(imagesFormatted);
+      if (uploadedImageUrls) await createVariantImages(imagesFormatted);
       router.push(`/admin/products/${productReference.productId}/variants/${variant.id}`);
     } catch (error) {
       setIsLoading(false);
@@ -65,10 +65,7 @@ export default function VariantPageCreateForm({ productReference }: PropsType) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <div className="bg-white p-4 rounded-xl mt-4">
-        <h2 className="font-semibold mb-2">Media</h2>
-        <UploadFile setValue={setValue} watchFiles={watchFiles} />
-      </div>
+      <UploadFile setValue={setValue} watchFiles={watchFiles} />
       <div className="bg-white p-4 rounded-xl mt-4">
         <h2 className="font-semibold mb-2">Pricing</h2>
         <div className="flex justify-between gap-4">
