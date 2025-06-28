@@ -51,12 +51,9 @@ export default function UploadFile({ setValue, watchFiles }: UploadFileProps) {
   return (
     <div className="bg-white p-4 rounded-xl mt-4">
       <div className="flex justify-between">
-        <h2 className="font-semibold mb-2">Media</h2>
+        <h2 className="font-semibold">Media</h2>
         {selectedIndexes.length > 0 && (
-          <button
-            onClick={deleteSelected}
-            className="mb-2 text-sm cursor-pointer text-red-800 font-medium hover:underline"
-          >
+          <button onClick={deleteSelected} className="text-sm cursor-pointer text-red-800 font-medium hover:underline">
             Delete selection
           </button>
         )}
@@ -64,7 +61,7 @@ export default function UploadFile({ setValue, watchFiles }: UploadFileProps) {
       <input id="file-upload" type="file" multiple accept="image/*" className="hidden" onChange={handleFiles} />
 
       {images.length < 1 ? (
-        <div className="min-w-[400px] w-full bg-gray-100 h-[200px] border-dashed border-neutral-700 border rounded-md flex flex-col items-center justify-center">
+        <div className="mt-2 min-w-[400px] w-full bg-gray-100 h-[200px] border-dashed border-neutral-700 border rounded-md flex flex-col items-center justify-center">
           <label
             htmlFor="file-upload"
             className="bg-white hover:bg-gray-50 rounded-md text-xs font-semibold p-2 shadow-md cursor-pointer"
@@ -75,7 +72,7 @@ export default function UploadFile({ setValue, watchFiles }: UploadFileProps) {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-3 gap-2 mt-4 max-w-full">
+          <div className="grid grid-cols-3 gap-2 mt-2 max-w-full">
             {images.map((src, index) => (
               <div key={index} className="relative border border-neutral-200 rounded-md">
                 <img src={src} alt={`preview ${index + 1}`} className="w-full h-40 object-contain rounded-md" />

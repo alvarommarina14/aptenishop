@@ -66,7 +66,7 @@ export default function VariantPageCreateForm({ productReference }: PropsType) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <UploadFile setValue={setValue} watchFiles={watchFiles} />
-      <div className="bg-white p-4 rounded-xl mt-4">
+      <div className="bg-white p-4 rounded-xl">
         <h2 className="font-semibold mb-2">Pricing</h2>
         <div className="flex justify-between gap-4">
           <div className="flex flex-col mb-5 gap-2 w-full">
@@ -111,7 +111,7 @@ export default function VariantPageCreateForm({ productReference }: PropsType) {
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-xl mt-4">
+      <div className="bg-white p-4 rounded-xl">
         <h2 className="font-semibold mb-2">Inventory</h2>
         <div className="flex flex-col mb-5 gap-2">
           <label htmlFor="sku" className="text-sm text-neutral-700">
