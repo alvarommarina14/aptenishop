@@ -64,3 +64,12 @@ export interface CreateProductForm {
   brand?: string | undefined;
   id?: number | undefined;
 }
+
+export interface CreateVariantForm {
+  sku: string;
+  price: number;
+  compareAtPrice?: number | undefined;
+  stock: number;
+  isAvailable: boolean;
+  productId?: number | undefined;
+}
