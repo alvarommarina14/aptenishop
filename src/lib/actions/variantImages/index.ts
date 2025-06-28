@@ -1,8 +1,6 @@
-import { CreateVariantForm } from "@/types";
-
-export async function createVariant(data: CreateVariantForm) {
+export async function createVariantImages(data: { url: string; variantId: number }[]) {
   try {
-    const res = await fetch(`/api/variants`, {
+    const res = await fetch(`/api/variant-images`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -13,7 +11,7 @@ export async function createVariant(data: CreateVariantForm) {
     if (!res.ok) {
       const error = await res.json();
       throw {
-        message: error.error || "Failed to create variant",
+        message: error.error || "Failed to create variant images",
         fieldErrors: error.errors || {},
       };
     }

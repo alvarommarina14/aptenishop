@@ -72,4 +72,5 @@ export interface CreateVariantForm {
   stock: number;
   isAvailable: boolean;
   productId?: number | undefined;
+  images?: File[];
 }

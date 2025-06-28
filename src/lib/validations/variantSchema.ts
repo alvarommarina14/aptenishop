@@ -47,16 +47,9 @@ export const createVariantSchema = z.object({
 
   isAvailable: z.boolean().optional(),
 
-  productId: z.number().int().positive("productId is required and must be a positive integer"),
+  productId: z.number().int().positive("product Id is required and must be a positive integer").optional(),
 
-  images: z
-    .array(
-      z.object({
-        url: z.string().url("Image URL must be valid"),
-        altText: z.string().min(3, "Alt text must have at least 3 characters").optional(),
-      }),
-    )
-    .optional(),
+  images: z.any().optional(),
 
   attributes: z
     .array(

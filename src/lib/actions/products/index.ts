@@ -12,8 +12,6 @@ export async function createProduct(data: CreateProductForm) {
 
     if (!res.ok) {
       const error = await res.json();
-      console.log(error);
-
       throw {
         message: error.error || "Failed to create product",
         fieldErrors: error.errors || {},
@@ -38,8 +36,6 @@ export async function updateProduct(data: CreateProductForm) {
 
     if (!res.ok) {
       const error = await res.json();
-      console.log(error);
-
       throw {
         message: error.error || "Failed to update product",
         fieldErrors: error.errors || {},

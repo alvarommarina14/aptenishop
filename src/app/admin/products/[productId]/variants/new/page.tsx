@@ -11,8 +11,8 @@ export default async function ProductVariantNew({ params }: PropsType) {
   const titleData = { title: "Add Variant", icon: Tag };
 
   return (
-    <div className="p-4 flex flex-col items-center ">
-      <div>
+    <div className="p-4 flex flex-col items-center">
+      <div className="min-w-[700px]">
         <PageTitle data={titleData} />
         <VariantPageCreateForm productReference={productReference} />
       </div>
