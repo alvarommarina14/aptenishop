@@ -64,7 +64,7 @@ export default function ProductPageUpdateForm({ productData }: propType) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <div className="bg-white p-4 rounded-xl mt-4">
+      <div className="bg-white p-4 rounded-xl mt-4 shadow-sm">
         <div className="flex flex-col mb-5 gap-2">
           <label htmlFor="name" className="text-sm text-neutral-700">
             Title
@@ -118,7 +118,7 @@ export default function ProductPageUpdateForm({ productData }: propType) {
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-xl">
+      <div className="bg-white p-4 rounded-xl shadow-sm">
         <p className="font-semibold text-sm mb-2">Variants</p>
         <Link
           href={`/admin/products/${productData.id}/variants/new`}

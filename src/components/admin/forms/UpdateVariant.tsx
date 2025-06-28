@@ -12,7 +12,7 @@ import { CreateVariantForm } from "@/types";
 import { uploadImagesToCloudinary } from "@/lib/actions/cloudinary";
 import { createVariantImages } from "@/lib/actions/variantImages";
 import { createVariant } from "@/lib/actions/variants";
-import { createVariantSchema } from "@/lib/validations/variantSchema";
+import { updateVariantSchema } from "@/lib/validations/variantSchema";
 
 import UploadFile from "@/components/admin/UploadFile";
 
@@ -20,7 +20,7 @@ type PropsType = {
   productReference: { productId: string };
 };
 
-export default function VariantPageCreateForm({ productReference }: PropsType) {
+export default function VariantPageUpdateForm({ productReference }: PropsType) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const {
@@ -30,7 +30,7 @@ export default function VariantPageCreateForm({ productReference }: PropsType) {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(createVariantSchema),
+    resolver: zodResolver(updateVariantSchema),
   });
 
   const watchFiles = watch("images");

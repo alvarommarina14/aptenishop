@@ -49,7 +49,7 @@ export default function UploadFile({ setValue, watchFiles }: UploadFileProps) {
   };
 
   return (
-    <div className="bg-white p-4 rounded-xl mt-4">
+    <div className="bg-white p-4 rounded-xl shadow-sm">
       <div className="flex justify-between">
         <h2 className="font-semibold">Media</h2>
         {selectedIndexes.length > 0 && (
