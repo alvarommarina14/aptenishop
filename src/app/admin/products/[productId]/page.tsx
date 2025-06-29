@@ -8,7 +8,8 @@ type Props = {
 };
 
 export default async function Product({ params }: Props) {
-  const product = await GetProductById(parseInt(params.productId));
+  const { productId } = await params;
+  const product = await GetProductById(parseInt(productId));
 
   if (!product) {
     return <p>Product not found</p>;
