@@ -47,3 +47,26 @@ export async function updateVariant(data: CreateVariantForm, id: number) {
     throw err;
   }
 }
+
+export async function deleteVariant(id: number) {
+  try {
+    const res = await fetch(`/api/variants/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw {
+        message: error.error || "Failed to delete variant",
+        fieldErrors: error.errors || {},
+      };
+    }
+
+    return await res.json();
+  } catch (err) {
+    throw err;
+  }
+}

@@ -11,10 +11,12 @@ import { LoaderCircle } from "lucide-react";
 import { CreateVariantForm, Variant } from "@/types";
 import { uploadImagesToCloudinary } from "@/lib/actions/cloudinary";
 import { createVariantImages } from "@/lib/actions/variantImages";
-import { updateVariant } from "@/lib/actions/variants";
+import { updateVariant, deleteVariant } from "@/lib/actions/variants";
 import { updateVariantSchema } from "@/lib/validations/variantSchema";
 
 import UploadFile from "@/components/admin/UploadFile";
+import Modal from "@/components/Modal";
+import ConfirmModal from "@/components/admin/ConfirmModal";
 
 type PropsType = {
   productReference: number;
@@ -23,6 +25,7 @@ type PropsType = {
 
 export default function VariantPageUpdateForm({ productReference, activeVariant }: PropsType) {
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const {
     register,
@@ -66,6 +69,18 @@ export default function VariantPageUpdateForm({ productReference, activeVariant 
       }
       router.refresh();
       setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.error(error);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+
+    try {
+      await deleteVariant(activeVariant.id);
+      router.push(`/admin/products/${productReference}`);
     } catch (error) {
       setIsLoading(false);
       console.error(error);
@@ -148,15 +163,37 @@ export default function VariantPageUpdateForm({ productReference, activeVariant 
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={isLoading || !isDirty}
-        className={`${
-          isLoading || !isDirty ? "bg-neutral-400 cursor-default" : "bg-neutral-700 hover:bg-neutral-800 cursor-pointer"
-        } text-white text-sm p-2 rounded-md self-end`}
-      >
-        {isLoading ? <LoaderCircle className="animate-spin" /> : <span>Save</span>}
-      </button>
+      <div className="flex items-center justify-end gap-4">
+        <button
+          type="button"
+          className="text-sm cursor-pointer text-red-800 font-medium hover:underline"
+          onClick={() => setIsOpen(true)}
+        >
+          Delete variant
+        </button>
+
+        <button
+          type="submit"
+          disabled={isLoading || !isDirty}
+          className={`${
+            isLoading || !isDirty
+              ? "bg-neutral-400 cursor-default"
+              : "bg-neutral-700 hover:bg-neutral-800 cursor-pointer"
+          } text-white text-sm p-2 rounded-md`}
+        >
+          {isLoading ? <LoaderCircle className="animate-spin" /> : <span>Save</span>}
+        </button>
+      </div>
+      {isOpen && (
+        <Modal onClose={() => setIsOpen(false)}>
+          <ConfirmModal
+            entity={"variant"}
+            entityItem={activeVariant.sku}
+            onClose={() => setIsOpen(false)}
+            onTrigger={handleDelete}
+          />
+        </Modal>
+      )}
     </form>
   );
 }
