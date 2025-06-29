@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { UseFormSetValue } from "react-hook-form";
 import { Plus } from "lucide-react";
-import { CreateVariantForm } from "@/types";
+import { CreateVariantForm, VariantImage } from "@/types";
 
 type UploadFileProps = {
   setValue: UseFormSetValue<CreateVariantForm>;
   watchFiles: File[] | undefined;
+  variantImages?: VariantImage[];
 };
 
-export default function UploadFile({ setValue, watchFiles }: UploadFileProps) {
+export default function UploadFile({ setValue, watchFiles, variantImages = [] }: UploadFileProps) {
   const [images, setImages] = useState<string[]>([]);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
 
@@ -60,7 +61,7 @@ export default function UploadFile({ setValue, watchFiles }: UploadFileProps) {
       </div>
       <input id="file-upload" type="file" multiple accept="image/*" className="hidden" onChange={handleFiles} />
 
-      {images.length < 1 ? (
+      {images.length < 1 && variantImages.length < 1 ? (
         <div className="mt-2 min-w-[400px] w-full bg-gray-100 h-[200px] border-dashed border-neutral-700 border rounded-md flex flex-col items-center justify-center">
           <label
             htmlFor="file-upload"
@@ -73,6 +74,17 @@ export default function UploadFile({ setValue, watchFiles }: UploadFileProps) {
       ) : (
         <>
           <div className="grid grid-cols-3 gap-2 mt-2 max-w-full">
+            {variantImages.map((image, index) => (
+              <div key={image.id} className="relative border border-neutral-200 rounded-md">
+                <img src={image.url} alt={image.altText || ""} className="w-full h-40 object-contain rounded-md" />
+                <input
+                  type="checkbox"
+                  checked={selectedIndexes.includes(index)}
+                  onChange={() => toggleSelection(index)}
+                  className="absolute top-1 left-1 h-5 w-5 accent-neutral-800 cursor-pointer"
+                />
+              </div>
+            ))}
             {images.map((src, index) => (
               <div key={index} className="relative border border-neutral-200 rounded-md">
                 <img src={src} alt={`preview ${index + 1}`} className="w-full h-40 object-contain rounded-md" />

@@ -77,7 +77,7 @@ export default function VariantPageUpdateForm({ productReference, activeVariant 
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <UploadFile setValue={setValue} watchFiles={watchFiles} />
+      <UploadFile setValue={setValue} watchFiles={watchFiles} variantImages={activeVariant.images} />
       <div className="bg-white p-4 rounded-xl shadow-sm">
         <h2 className="font-semibold mb-2">Pricing</h2>
         <div className="flex justify-between gap-4">
@@ -111,7 +111,6 @@ export default function VariantPageUpdateForm({ productReference, activeVariant 
               </span>
               <input
                 {...register("compareAtPrice", { valueAsNumber: true })}
-                defaultValue="0.00"
                 id="compareAtPrice"
                 type="text"
                 inputMode="decimal"
@@ -144,7 +143,6 @@ export default function VariantPageUpdateForm({ productReference, activeVariant 
           </label>
           <input
             {...register("stock", { valueAsNumber: true })}
-            defaultValue={"0"}
             id="stock"
             type="number"
             className="border rounded-md border-neutral-500 text-sm p-2 pl-3"
