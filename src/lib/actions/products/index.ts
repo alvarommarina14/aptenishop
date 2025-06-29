@@ -47,3 +47,26 @@ export async function updateProduct(data: CreateProductForm) {
     throw err;
   }
 }
+
+export async function deleteProduct(id: number) {
+  try {
+    const res = await fetch(`/api/products/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw {
+        message: error.error || "Failed to delete product",
+        fieldErrors: error.errors || {},
+      };
+    }
+
+    return await res.json();
+  } catch (err) {
+    throw err;
+  }
+}

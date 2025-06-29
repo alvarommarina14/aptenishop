@@ -1,16 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CirclePlus, LoaderCircle } from "lucide-react";
 
 import { Product, CreateProductForm } from "@/types";
-import { updateProduct } from "@/lib/actions/products";
+import { updateProduct, deleteProduct } from "@/lib/actions/products";
 import { updateProductSchema } from "@/lib/validations/admin/productFormSchema";
 import { generateRows } from "@/lib/helpers";
 
 import Table from "@/components/admin/Table";
+import Modal from "@/components/Modal";
+import ConfirmModal from "@/components/admin/ConfirmModal";
 import Link from "next/link";
 
 type propType = {
@@ -18,6 +22,8 @@ type propType = {
 };
 
 export default function ProductPageUpdateForm({ productData }: propType) {
+  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const variants = productData?.variants.length > 0 ? productData?.variants : null;
   const columns = variants
@@ -56,6 +62,18 @@ export default function ProductPageUpdateForm({ productData }: propType) {
       await updateProduct(completeData);
       reset(completeData);
       setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.error(error);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+
+    try {
+      await deleteProduct(productData.id);
+      router.push(`/admin/products`);
     } catch (error) {
       setIsLoading(false);
       console.error(error);
@@ -134,15 +152,37 @@ export default function ProductPageUpdateForm({ productData }: propType) {
         )}
       </div>
 
-      <button
-        type="submit"
-        disabled={!isDirty || isLoading}
-        className={`${
-          isLoading || !isDirty ? "bg-neutral-400 cursor-default" : "bg-neutral-700 hover:bg-neutral-800 cursor-pointer"
-        } text-white text-sm p-2 rounded-md self-end`}
-      >
-        {isLoading ? <LoaderCircle className="animate-spin" /> : <span>Save</span>}
-      </button>
+      <div className="flex items-center justify-end gap-4">
+        <button
+          type="button"
+          className="text-sm cursor-pointer text-red-800 font-medium hover:underline"
+          onClick={() => setIsOpen(true)}
+        >
+          Delete product
+        </button>
+
+        <button
+          type="submit"
+          disabled={!isDirty || isLoading}
+          className={`${
+            isLoading || !isDirty
+              ? "bg-neutral-400 cursor-default"
+              : "bg-neutral-700 hover:bg-neutral-800 cursor-pointer"
+          } text-white text-sm p-2 rounded-md self-end`}
+        >
+          {isLoading ? <LoaderCircle className="animate-spin" /> : <span>Save</span>}
+        </button>
+      </div>
+      {isOpen && (
+        <Modal onClose={() => setIsOpen(false)}>
+          <ConfirmModal
+            entity={"product"}
+            entityItem={productData.name}
+            onClose={() => setIsOpen(false)}
+            onTrigger={handleDelete}
+          />
+        </Modal>
+      )}
     </form>
   );
 }
