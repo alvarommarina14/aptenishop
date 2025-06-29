@@ -25,10 +25,8 @@ export default function VariantPageUpdateForm({ productReference, activeVariant 
   const {
     register,
     setValue,
-    reset,
-    watch,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm({
     resolver: zodResolver(updateVariantSchema),
     defaultValues: {
@@ -38,8 +36,6 @@ export default function VariantPageUpdateForm({ productReference, activeVariant 
       stock: activeVariant.stock,
     },
   });
-
-  const watchFiles = watch("images");
 
   const onSubmit = async (data: CreateVariantForm) => {
     setIsLoading(true);
@@ -66,9 +62,7 @@ export default function VariantPageUpdateForm({ productReference, activeVariant 
       if (imagesFormatted?.length) {
         await createVariantImages(imagesFormatted);
       }
-
-      reset(dataCompleted);
-      setIsLoading(false);
+      window.location.reload();
     } catch (error) {
       setIsLoading(false);
       console.error(error);
@@ -77,12 +71,7 @@ export default function VariantPageUpdateForm({ productReference, activeVariant 
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <UploadFile
-        setValue={setValue}
-        watchFiles={watchFiles}
-        variantImages={activeVariant.images}
-        setIsLoading={setIsLoading}
-      />
+      <UploadFile setValue={setValue} variantImages={activeVariant.images} setIsLoading={setIsLoading} />
       <div className="bg-white p-4 rounded-xl shadow-sm">
         <h2 className="font-semibold mb-2">Pricing</h2>
         <div className="flex justify-between gap-4">
@@ -158,9 +147,9 @@ export default function VariantPageUpdateForm({ productReference, activeVariant 
 
       <button
         type="submit"
-        disabled={isLoading}
+        disabled={isLoading || !isDirty}
         className={`${
-          isLoading ? "bg-neutral-400 cursor-default" : "bg-neutral-700 hover:bg-neutral-800 cursor-pointer"
+          isLoading || !isDirty ? "bg-neutral-400 cursor-default" : "bg-neutral-700 hover:bg-neutral-800 cursor-pointer"
         } text-white text-sm p-2 rounded-md self-end`}
       >
         {isLoading ? <LoaderCircle className="animate-spin" /> : <span>Save</span>}

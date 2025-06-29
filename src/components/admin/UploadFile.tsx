@@ -6,30 +6,40 @@ import { deleteVariantImages } from "@/lib/actions/variantImages";
 
 type UploadFileProps = {
   setValue: UseFormSetValue<CreateVariantForm>;
-  watchFiles: File[] | undefined;
   variantImages?: VariantImage[];
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function UploadFile({ setValue, watchFiles, variantImages = [], setIsLoading }: UploadFileProps) {
-  const [serverImages, setServerImages] = useState<VariantImage[]>(variantImages);
-  const [images, setImages] = useState<string[]>([]);
+type ServerImage = { type: "server"; data: VariantImage };
+type LocalImage = { type: "local"; data: string; file: File };
+type ImageItem = ServerImage | LocalImage;
+
+export default function UploadFile({ setValue, variantImages = [], setIsLoading }: UploadFileProps) {
+  const [images, setImages] = useState<ImageItem[]>(variantImages.map((img) => ({ type: "server", data: img })));
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
+
+  const updateFormFiles = (imageItems: ImageItem[]) => {
+    const localFiles = imageItems.filter((img): img is LocalImage => img.type === "local").map((img) => img.file);
+
+    setValue("images", localFiles, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
 
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
-    images.forEach((url) => URL.revokeObjectURL(url));
-
     const files = Array.from(e.target.files);
-    const urls = files.map((file) => URL.createObjectURL(file));
-    setImages((prev) => [...prev, ...urls]);
+    const newImages: LocalImage[] = files.map((file) => ({
+      type: "local",
+      data: URL.createObjectURL(file),
+      file,
+    }));
 
-    const currentFiles = watchFiles ? Array.from(watchFiles) : [];
-    setValue("images", [...currentFiles, ...files], {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
+    const updatedImages = [...images, ...newImages];
+    setImages(updatedImages);
+    updateFormFiles(updatedImages);
   };
 
   const toggleSelection = (index: number) => {
@@ -37,47 +47,29 @@ export default function UploadFile({ setValue, watchFiles, variantImages = [], s
   };
 
   const deleteSelected = async () => {
-    setIsLoading(true);
     if (selectedIndexes.length === 0) return;
 
-    try {
-      const imagesToDeleteFromDB = serverImages
-        .filter((_, index) => selectedIndexes.includes(index))
-        .map((img) => ({
-          id: img.id,
-          publicId: img.publicId,
-        }));
+    const toDelete = selectedIndexes.map((i) => images[i]);
+    const remaining = images.filter((_, i) => !selectedIndexes.includes(i));
 
-      const newImagesToDelete = images.filter((_, index) => {
-        const virtualIndex = index + serverImages.length;
-        return selectedIndexes.includes(virtualIndex);
-      });
+    toDelete.forEach((img) => {
+      if (img.type === "local") URL.revokeObjectURL(img.data);
+    });
 
-      const remainingNewImages = images.filter((_, index) => {
-        const virtualIndex = index + serverImages.length;
-        return !selectedIndexes.includes(virtualIndex);
-      });
+    setImages(remaining);
+    updateFormFiles(remaining);
+    setSelectedIndexes([]);
 
-      const remainingFiles =
-        watchFiles?.filter((_, index) => {
-          const virtualIndex = index + serverImages.length;
-          return !selectedIndexes.includes(virtualIndex);
-        }) || [];
-
-      newImagesToDelete.forEach((url) => URL.revokeObjectURL(url));
-      setImages(remainingNewImages);
-      setValue("images", remainingFiles);
-
-      if (imagesToDeleteFromDB.length > 0) {
-        await deleteVariantImages(imagesToDeleteFromDB);
-        setServerImages((prev) => prev.filter((_, index) => !selectedIndexes.includes(index)));
-      }
-
-      setSelectedIndexes([]);
-    } catch (err) {
-      console.error("Error deleting images", err);
-    } finally {
-      setIsLoading(false);
+    const serverImages = toDelete.filter((img): img is ServerImage => img.type === "server");
+    if (serverImages.length > 0) {
+      setIsLoading(true);
+      await deleteVariantImages(
+        serverImages.map((img) => ({
+          id: img.data.id,
+          publicId: img.data.publicId,
+        })),
+      );
+      window.location.reload();
     }
   };
 
@@ -95,9 +87,10 @@ export default function UploadFile({ setValue, watchFiles, variantImages = [], s
           </button>
         )}
       </div>
+
       <input id="file-upload" type="file" multiple accept="image/*" className="hidden" onChange={handleFiles} />
 
-      {images.length < 1 && serverImages.length < 1 ? (
+      {images.length === 0 ? (
         <div className="mt-2 min-w-[400px] w-full bg-gray-100 h-[200px] border-dashed border-neutral-700 border rounded-md flex flex-col items-center justify-center">
           <label
             htmlFor="file-upload"
@@ -108,43 +101,33 @@ export default function UploadFile({ setValue, watchFiles, variantImages = [], s
           <p className="text-xs text-neutral-700 mt-2">Only accepts images</p>
         </div>
       ) : (
-        <>
-          <div className="grid grid-cols-3 gap-2 mt-2 max-w-full">
-            {serverImages.map((image, index) => (
-              <div key={image.id} className="relative border border-neutral-200 rounded-md">
-                <img src={image.url} alt={image.altText || ""} className="w-full h-40 object-contain rounded-md" />
-                <input
-                  type="checkbox"
-                  checked={selectedIndexes.includes(index)}
-                  onChange={() => toggleSelection(index)}
-                  className="absolute top-1 left-1 h-5 w-5 accent-neutral-800 cursor-pointer"
-                />
-              </div>
-            ))}
-
-            {images.map((src, index) => {
-              const combinedIndex = index + serverImages.length;
-              return (
-                <div key={index} className="relative border border-neutral-200 rounded-md">
-                  <img src={src} alt={`preview ${index + 1}`} className="w-full h-40 object-contain rounded-md" />
-                  <input
-                    type="checkbox"
-                    checked={selectedIndexes.includes(combinedIndex)}
-                    onChange={() => toggleSelection(combinedIndex)}
-                    className="absolute top-1 left-1 h-5 w-5 accent-neutral-800 cursor-pointer"
-                  />
-                </div>
-              );
-            })}
-
-            <label
-              htmlFor="file-upload"
-              className="h-20 w-20 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-md p-2 cursor-pointer border-dashed border-neutral-700 border"
+        <div className="grid grid-cols-3 gap-2 mt-2 max-w-full">
+          {images.map((img, index) => (
+            <div
+              key={img.type === "server" ? img.data.id : img.data}
+              className="relative border border-neutral-200 rounded-md"
             >
-              <Plus className="text-neutral-700 h-4 w-4" />
-            </label>
-          </div>
-        </>
+              <img
+                src={img.type === "server" ? img.data.url : img.data}
+                alt={img.type === "server" ? img.data.altText || "" : `preview ${index + 1}`}
+                className="w-full h-40 object-contain rounded-md"
+              />
+              <input
+                type="checkbox"
+                checked={selectedIndexes.includes(index)}
+                onChange={() => toggleSelection(index)}
+                className="absolute top-1 left-1 h-5 w-5 accent-neutral-800 cursor-pointer"
+              />
+            </div>
+          ))}
+
+          <label
+            htmlFor="file-upload"
+            className="h-20 w-20 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-md p-2 cursor-pointer border-dashed border-neutral-700 border"
+          >
+            <Plus className="text-neutral-700 h-4 w-4" />
+          </label>
+        </div>
       )}
     </div>
   );
