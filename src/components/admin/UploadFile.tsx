@@ -2,14 +2,17 @@ import { useState } from "react";
 import { UseFormSetValue } from "react-hook-form";
 import { Plus } from "lucide-react";
 import { CreateVariantForm, VariantImage } from "@/types";
+import { deleteVariantImages } from "@/lib/actions/variantImages";
 
 type UploadFileProps = {
   setValue: UseFormSetValue<CreateVariantForm>;
   watchFiles: File[] | undefined;
   variantImages?: VariantImage[];
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function UploadFile({ setValue, watchFiles, variantImages = [] }: UploadFileProps) {
+export default function UploadFile({ setValue, watchFiles, variantImages = [], setIsLoading }: UploadFileProps) {
+  const [serverImages, setServerImages] = useState<VariantImage[]>(variantImages);
   const [images, setImages] = useState<string[]>([]);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
 
@@ -33,20 +36,49 @@ export default function UploadFile({ setValue, watchFiles, variantImages = [] }:
     setSelectedIndexes((prev) => (prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]));
   };
 
-  const deleteSelected = () => {
-    const newImages = images.filter((_, idx) => !selectedIndexes.includes(idx));
-    const newFiles = watchFiles?.filter((_, idx) => !selectedIndexes.includes(idx)) || [];
+  const deleteSelected = async () => {
+    setIsLoading(true);
+    if (selectedIndexes.length === 0) return;
 
-    selectedIndexes.forEach((idx) => {
-      URL.revokeObjectURL(images[idx]);
-    });
+    try {
+      const imagesToDeleteFromDB = serverImages
+        .filter((_, index) => selectedIndexes.includes(index))
+        .map((img) => ({
+          id: img.id,
+          publicId: img.publicId,
+        }));
 
-    setImages(newImages);
-    setSelectedIndexes([]);
-    setValue("images", newFiles, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
+      const newImagesToDelete = images.filter((_, index) => {
+        const virtualIndex = index + serverImages.length;
+        return selectedIndexes.includes(virtualIndex);
+      });
+
+      const remainingNewImages = images.filter((_, index) => {
+        const virtualIndex = index + serverImages.length;
+        return !selectedIndexes.includes(virtualIndex);
+      });
+
+      const remainingFiles =
+        watchFiles?.filter((_, index) => {
+          const virtualIndex = index + serverImages.length;
+          return !selectedIndexes.includes(virtualIndex);
+        }) || [];
+
+      newImagesToDelete.forEach((url) => URL.revokeObjectURL(url));
+      setImages(remainingNewImages);
+      setValue("images", remainingFiles);
+
+      if (imagesToDeleteFromDB.length > 0) {
+        await deleteVariantImages(imagesToDeleteFromDB);
+        setServerImages((prev) => prev.filter((_, index) => !selectedIndexes.includes(index)));
+      }
+
+      setSelectedIndexes([]);
+    } catch (err) {
+      console.error("Error deleting images", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -54,14 +86,18 @@ export default function UploadFile({ setValue, watchFiles, variantImages = [] }:
       <div className="flex justify-between">
         <h2 className="font-semibold">Media</h2>
         {selectedIndexes.length > 0 && (
-          <button onClick={deleteSelected} className="text-sm cursor-pointer text-red-800 font-medium hover:underline">
+          <button
+            type="button"
+            onClick={deleteSelected}
+            className="text-sm cursor-pointer text-red-800 font-medium hover:underline"
+          >
             Delete selection
           </button>
         )}
       </div>
       <input id="file-upload" type="file" multiple accept="image/*" className="hidden" onChange={handleFiles} />
 
-      {images.length < 1 && variantImages.length < 1 ? (
+      {images.length < 1 && serverImages.length < 1 ? (
         <div className="mt-2 min-w-[400px] w-full bg-gray-100 h-[200px] border-dashed border-neutral-700 border rounded-md flex flex-col items-center justify-center">
           <label
             htmlFor="file-upload"
@@ -74,7 +110,7 @@ export default function UploadFile({ setValue, watchFiles, variantImages = [] }:
       ) : (
         <>
           <div className="grid grid-cols-3 gap-2 mt-2 max-w-full">
-            {variantImages.map((image, index) => (
+            {serverImages.map((image, index) => (
               <div key={image.id} className="relative border border-neutral-200 rounded-md">
                 <img src={image.url} alt={image.altText || ""} className="w-full h-40 object-contain rounded-md" />
                 <input
@@ -85,17 +121,21 @@ export default function UploadFile({ setValue, watchFiles, variantImages = [] }:
                 />
               </div>
             ))}
-            {images.map((src, index) => (
-              <div key={index} className="relative border border-neutral-200 rounded-md">
-                <img src={src} alt={`preview ${index + 1}`} className="w-full h-40 object-contain rounded-md" />
-                <input
-                  type="checkbox"
-                  checked={selectedIndexes.includes(index)}
-                  onChange={() => toggleSelection(index)}
-                  className="absolute top-1 left-1 h-5 w-5 accent-neutral-800 cursor-pointer"
-                />
-              </div>
-            ))}
+
+            {images.map((src, index) => {
+              const combinedIndex = index + serverImages.length;
+              return (
+                <div key={index} className="relative border border-neutral-200 rounded-md">
+                  <img src={src} alt={`preview ${index + 1}`} className="w-full h-40 object-contain rounded-md" />
+                  <input
+                    type="checkbox"
+                    checked={selectedIndexes.includes(combinedIndex)}
+                    onChange={() => toggleSelection(combinedIndex)}
+                    className="absolute top-1 left-1 h-5 w-5 accent-neutral-800 cursor-pointer"
+                  />
+                </div>
+              );
+            })}
 
             <label
               htmlFor="file-upload"

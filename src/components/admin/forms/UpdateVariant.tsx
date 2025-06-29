@@ -77,7 +77,12 @@ export default function VariantPageUpdateForm({ productReference, activeVariant 
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <UploadFile setValue={setValue} watchFiles={watchFiles} variantImages={activeVariant.images} />
+      <UploadFile
+        setValue={setValue}
+        watchFiles={watchFiles}
+        variantImages={activeVariant.images}
+        setIsLoading={setIsLoading}
+      />
       <div className="bg-white p-4 rounded-xl shadow-sm">
         <h2 className="font-semibold mb-2">Pricing</h2>
         <div className="flex justify-between gap-4">
