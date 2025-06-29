@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +22,7 @@ type PropsType = {
 };
 
 export default function VariantPageUpdateForm({ productReference, activeVariant }: PropsType) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const {
     register,
@@ -62,7 +64,8 @@ export default function VariantPageUpdateForm({ productReference, activeVariant 
       if (imagesFormatted?.length) {
         await createVariantImages(imagesFormatted);
       }
-      window.location.reload();
+      router.refresh();
+      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       console.error(error);

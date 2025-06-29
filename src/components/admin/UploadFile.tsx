@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { UseFormSetValue } from "react-hook-form";
 import { Plus } from "lucide-react";
 import { CreateVariantForm, VariantImage } from "@/types";
@@ -15,6 +17,7 @@ type LocalImage = { type: "local"; data: string; file: File };
 type ImageItem = ServerImage | LocalImage;
 
 export default function UploadFile({ setValue, variantImages = [], setIsLoading }: UploadFileProps) {
+  const router = useRouter();
   const [images, setImages] = useState<ImageItem[]>(variantImages.map((img) => ({ type: "server", data: img })));
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
 
@@ -69,7 +72,8 @@ export default function UploadFile({ setValue, variantImages = [], setIsLoading 
           publicId: img.data.publicId,
         })),
       );
-      window.location.reload();
+      router.refresh();
+      setIsLoading(false);
     }
   };
 

@@ -15,11 +15,12 @@ type PropsType = {
 };
 
 export default async function VariantPage({ params }: PropsType) {
-  const product = await GetProductById(parseInt(params.productId));
+  const { productId } = await params;
+  const product = await GetProductById(parseInt(productId));
   if (!product) return <div>No product found</div>;
 
   const variants = product.variants;
-  const activeVariant = variants.filter((v) => v.id == parseInt(params.variantId));
+  const activeVariant = variants.filter((v) => v.id == parseInt(productId));
 
   const titleData = { title: activeVariant[0].sku, icon: Tag };
 
