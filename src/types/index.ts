@@ -2,6 +2,7 @@ export interface VariantImage {
   id: number;
   url: string;
   variantId: number;
+  publicId: string;
   altText?: string | null;
 }
 
@@ -39,4 +40,38 @@ export interface Product {
   createdAt: Date;
   updatedAt: Date;
   variants: Variant[];
+}
+
+export interface TableColumn {
+  key: string;
+  label: string;
+  hide: boolean;
+}
+
+export interface ImageData {
+  url: string;
+  altText?: string;
+}
+
+export interface RowData {
+  image?: ImageData;
+  [key: string]: string | ImageData | undefined;
+}
+
+export interface CreateProductForm {
+  name: string;
+  description: string;
+  productType: string;
+  brand?: string | undefined;
+  id?: number | undefined;
+}
+
+export interface CreateVariantForm {
+  sku: string;
+  price: number;
+  compareAtPrice?: number | undefined;
+  stock: number;
+  isAvailable: boolean;
+  productId?: number | undefined;
+  images?: File[] | null;
 }

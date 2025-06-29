@@ -35,15 +35,13 @@ export default function Login() {
       redirect: false,
     });
 
-    console.log(res);
-
     if (res?.error) {
       setIsError({
         isError: !res.ok,
         message: res.error,
       });
     } else {
-      router.push("/");
+      router.push("/admin");
     }
   };
 
