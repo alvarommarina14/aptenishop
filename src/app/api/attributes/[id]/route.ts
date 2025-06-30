@@ -13,7 +13,7 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
     });
 
     if (!attribute) {
-      return NextResponse.json({ message: "Atributo no encontrado" }, { status: 404 });
+      return NextResponse.json({ message: "Attribute not found" }, { status: 404 });
     }
     return NextResponse.json(attribute);
   } catch (error) {
@@ -53,7 +53,7 @@ export async function DELETE(_: NextRequest, { params }: { params: { id: string 
       where: { id },
     });
 
-    return NextResponse.json({ message: "Atributo eliminado" });
+    return NextResponse.json({ message: "Attribute deleted" });
   } catch (error) {
     console.error("Error deleting attribute:", error);
     return NextResponse.json({ message: "Error deleting attribute" }, { status: 500 });

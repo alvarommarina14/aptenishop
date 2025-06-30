@@ -1,18 +1,20 @@
 import { NextResponse, NextRequest } from "next/server";
-import { PrismaClient } from "@/generated/prisma";
+import { prisma } from "@/lib/prisma";
 import { createAttributeSchema } from "@/lib/validations/attributeSchema";
-
-const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const attribute = await prisma.attribute.findMany();
+    const attribute = await prisma.attribute.findMany({
+      include: {
+        attributeValues: true,
+      },
+    });
     if (!attribute) {
-      return NextResponse.json({ message: "No hay atributos" }, { status: 404 });
+      return NextResponse.json({ message: "Attributes not found" }, { status: 404 });
     }
     return NextResponse.json(attribute);
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error("Error fetching attributes:", error);
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }

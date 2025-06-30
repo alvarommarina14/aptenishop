@@ -8,3 +8,7 @@ export const createProductSchema = z.object({
 });
 
 export const updateProductSchema = createProductSchema.partial();
+
+export type ProductFormCreateInputs = z.infer<typeof createProductSchema>;
+
+export type ProductFormUpdateInputs = z.infer<typeof updateProductSchema>;

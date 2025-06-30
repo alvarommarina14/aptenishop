@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const products = await GetAllProducts();
     if (!products) {
-      return NextResponse.json({ message: "No hay productos" }, { status: 404 });
+      return NextResponse.json({ message: "No products found" }, { status: 404 });
     }
     return NextResponse.json(products);
   } catch (error) {

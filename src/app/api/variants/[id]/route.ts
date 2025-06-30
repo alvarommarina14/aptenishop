@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@/generated/prisma";
+import { prisma } from "@/lib/prisma";
 import { updateVariantSchema } from "@/lib/validations/variantSchema";
-
-const prisma = new PrismaClient();
 
 export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -12,16 +10,20 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
       where: { id },
       include: {
         images: true,
-        attributes: {
+        variantValues: {
           include: {
-            attribute: true,
+            attributeValue: {
+              include: {
+                attribute: true,
+              },
+            },
           },
         },
       },
     });
 
     if (!variant) {
-      return NextResponse.json({ message: "Variante no encontrada" }, { status: 404 });
+      return NextResponse.json({ message: "Variant not found" }, { status: 404 });
     }
     return NextResponse.json(variant);
   } catch (error) {
@@ -61,7 +63,7 @@ export async function DELETE(_: NextRequest, { params }: { params: { id: string 
       where: { id },
     });
 
-    return NextResponse.json({ message: "Variante eliminada" });
+    return NextResponse.json({ message: "Variant deleted" });
   } catch (error) {
     console.error("Error deleting variant:", error);
     return NextResponse.json({ message: "Error deleting variant" }, { status: 500 });

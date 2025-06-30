@@ -8,7 +8,7 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
     const product = await GetProductById(parseInt(params.id));
 
     if (!product) {
-      return NextResponse.json({ message: "Producto no encontrado" }, { status: 404 });
+      return NextResponse.json({ message: "Product not found" }, { status: 404 });
     }
     return NextResponse.json(product);
   } catch (error) {
@@ -48,7 +48,7 @@ export async function DELETE(_: NextRequest, { params }: { params: { id: string 
       where: { id },
     });
 
-    return NextResponse.json({ message: "Producto eliminado" });
+    return NextResponse.json({ message: "Product deleted" });
   } catch (error) {
     console.error("Error deleting product:", error);
     return NextResponse.json({ message: "Error deleting product" }, { status: 500 });

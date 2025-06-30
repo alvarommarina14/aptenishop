@@ -1,86 +1,75 @@
 import { PrismaClient } from "../src/generated/prisma";
+
 const prisma = new PrismaClient();
 
 async function main() {
-  const colorAttr = await prisma.attribute.create({
-    data: { name: "Color" },
-  });
-
-  const pesoAttr = await prisma.attribute.create({
-    data: { name: "Peso" },
-  });
-
-  const packAttr = await prisma.attribute.create({
-    data: { name: "Tamaño del pack" },
-  });
-
-  await prisma.product.create({
+  const product = await prisma.product.create({
     data: {
-      name: "Wilson Pro Staff X V14",
-      description: "Raqueta profesional para jugadores avanzados, con excelente control y estabilidad.",
+      name: "Raqueta Wilson Pro Staff X V14",
+      description: "Raqueta profesional para jugadores avanzados, con excelente control, estabilidad y precisión.",
       productType: "Raqueta",
-      variants: {
-        create: [
-          {
-            sku: "WPSX-V14-NR-315",
-            price: 279.99,
-            stock: 10,
-            attributes: {
-              create: [
-                { value: "Dorado", attributeId: colorAttr.id },
-                { value: "315g", attributeId: pesoAttr.id },
-              ],
-            },
-            images: {
-              create: [{ url: "https://images.fravega.com/f500/5bdc89dd70afda7aa99738f2223ef774.jpg" }],
-            },
-          },
-          {
-            sku: "WPSX-V14-BD-300",
-            price: 279.99,
-            stock: 5,
-            attributes: {
-              create: [
-                { value: "Negro", attributeId: colorAttr.id },
-                { value: "300g", attributeId: pesoAttr.id },
-              ],
-            },
-            images: {
-              create: [
-                {
-                  url: "https://production.cdn.vaypol.com/variants/xxxzksru0eahznppd7j23jhreche/e82c8d6171dd25bb538f2e7263b5bc7dfc6a79352d85923074be76df53fbc6f4",
-                },
-              ],
-            },
-          },
-        ],
+      brand: "Wilson",
+    },
+  });
+
+  const colorAttr = await prisma.attribute.create({
+    data: {
+      name: "Color",
+      attributeValues: {
+        create: [{ value: "Negro" }, { value: "Rojo" }],
       },
     },
   });
 
-  await prisma.product.create({
+  const pesoAttr = await prisma.attribute.create({
     data: {
-      name: "Pelotas Wilson US Open Extra Duty",
-      description: "Pelotas oficiales del US Open. Rendimiento y durabilidad en canchas duras.",
-      productType: "Pelota",
-      variants: {
-        create: [
-          {
-            sku: "WUSOPEN-XD-3PK",
-            price: 8.99,
-            stock: 100,
-            attributes: {
-              create: [{ value: "Pack de 3", attributeId: packAttr.id }],
-            },
-            images: {
-              create: [
-                {
-                  url: "https://www.wilsonstore.com.ar/cdn/shop/products/2a15448b-8bfa-4e5f-97a4-d8f08ebd7cb3.jpg?v=1692196758",
-                },
-              ],
-            },
-          },
-        ],
+      name: "Peso",
+      attributeValues: {
+        create: [{ value: "300g" }, { value: "310g" }],
+      },
+    },
+  });
+
+  await prisma.productAttribute.createMany({
+    data: [
+      { productId: product.id, attributeId: colorAttr.id },
+      { productId: product.id, attributeId: pesoAttr.id },
+    ],
+  });
+
+  const negroValue = await prisma.attributeValue.findFirstOrThrow({
+    where: { value: "Negro", attributeId: colorAttr.id },
+  });
+  const rojoValue = await prisma.attributeValue.findFirstOrThrow({
+    where: { value: "Rojo", attributeId: colorAttr.id },
+  });
+  const peso300gValue = await prisma.attributeValue.findFirstOrThrow({
+    where: { value: "300g", attributeId: pesoAttr.id },
+  });
+  const peso310gValue = await prisma.attributeValue.findFirstOrThrow({
+    where: { value: "310g", attributeId: pesoAttr.id },
+  });
+
+  const varianteNegro300 = await prisma.variant.create({
+    data: {
+      sku: "WPSX-V14-NEGRO-300",
+      price: 259.99,
+      stock: 6,
+      productId: product.id,
+      variantValues: {
+        create: [{ attributeValueId: negroValue.id }, { attributeValueId: peso300gValue.id }],
+      },
+    },
+  });
+
+  const varianteRojo310 = await prisma.variant.create({
+    data: {
+      sku: "WPSX-V14-ROJO-310",
+      price: 269.99,
+      stock: 4,
+      productId: product.id,
+      variantValues: {
+        create: [{ attributeValueId: rojoValue.id }, { attributeValueId: peso310gValue.id }],
       },
     },
   });
@@ -89,6 +78,7 @@ async function main() {
 main()
   .catch((e) => {
     console.error(e);
-    process.exit(1);
   })
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
