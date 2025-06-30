@@ -1,3 +1,22 @@
+export interface Attribute {
+  id: number;
+  name: string;
+}
+
+export interface AttributeValue {
+  id: number;
+  value: string;
+  attributeId: number;
+  attribute: Attribute;
+}
+
+export interface VariantValue {
+  id: number;
+  variantId: number;
+  attributeValueId: number;
+  attributeValue: AttributeValue;
+}
+
 export interface VariantImage {
   id: number;
   url: string;
@@ -6,29 +25,23 @@ export interface VariantImage {
   altText?: string | null;
 }
 
-export interface Attribute {
-  id: number;
-  name: string;
-}
-
-export interface VariantAttribute {
-  id: number;
-  value: string;
-  variantId: number;
-  attributeId: number;
-  attribute: Attribute;
-}
-
 export interface Variant {
   id: number;
-  sku: string;
-  price: number;
+  sku?: string | null;
+  price?: number | null;
   compareAtPrice?: number | null;
-  stock: number;
-  isAvailable: boolean;
+  stock?: number | null;
+  isAvailable?: boolean | null;
   productId: number;
   images: VariantImage[];
-  attributes: VariantAttribute[];
+  variantValues: VariantValue[];
+}
+
+export interface ProductAttribute {
+  id: number;
+  productId: number;
+  attributeId: number;
+  attribute: Attribute;
 }
 
 export interface Product {
@@ -40,6 +53,7 @@ export interface Product {
   createdAt: Date;
   updatedAt: Date;
   variants: Variant[];
+  productAttributes: ProductAttribute[];
 }
 
 export interface TableColumn {
@@ -56,14 +70,6 @@ export interface ImageData {
 export interface RowData {
   image?: ImageData;
   [key: string]: string | ImageData | undefined;
-}
-
-export interface CreateProductForm {
-  name: string;
-  description: string;
-  productType: string;
-  brand?: string | undefined;
-  id?: number | undefined;
 }
 
 export interface CreateVariantForm {

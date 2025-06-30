@@ -7,15 +7,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CirclePlus, LoaderCircle } from "lucide-react";
 
-import { Product, CreateProductForm } from "@/types";
+import { Product } from "@/types";
 import { updateProduct, deleteProduct } from "@/lib/actions/products";
-import { updateProductSchema } from "@/lib/validations/admin/productFormSchema";
+import { updateProductSchema, ProductFormUpdateInputs } from "@/lib/validations/admin/productFormSchema";
 import { generateRows } from "@/lib/helpers";
 
 import Table from "@/components/admin/Table";
 import Modal from "@/components/Modal";
 import ConfirmModal from "@/components/admin/ConfirmModal";
 import Link from "next/link";
+import ProductForm from "@/components/admin/forms/Product";
 
 type propType = {
   productData: Product;
@@ -40,8 +41,7 @@ export default function ProductPageUpdateForm({ productData }: propType) {
     register,
     handleSubmit,
     formState: { errors, isDirty },
-    reset,
-  } = useForm({
+  } = useForm<ProductFormUpdateInputs>({
     resolver: zodResolver(updateProductSchema),
     defaultValues: {
       name: productData.name,
@@ -51,7 +51,7 @@ export default function ProductPageUpdateForm({ productData }: propType) {
     },
   });
 
-  const onSubmit = async (data: CreateProductForm) => {
+  const onSubmit = async (data: ProductFormUpdateInputs) => {
     setIsLoading(true);
     const completeData = {
       ...data,
@@ -60,7 +60,7 @@ export default function ProductPageUpdateForm({ productData }: propType) {
 
     try {
       await updateProduct(completeData);
-      reset(completeData);
+      router.refresh();
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -81,60 +81,8 @@ export default function ProductPageUpdateForm({ productData }: propType) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <div className="bg-white p-4 rounded-xl mt-4 shadow-sm">
-        <div className="flex flex-col mb-5 gap-2">
-          <label htmlFor="name" className="text-sm text-neutral-700">
-            Title
-          </label>
-          <input
-            {...register("name")}
-            id="name"
-            type="text"
-            className="border rounded-md border-neutral-500 text-sm p-2 pl-3"
-          />
-          {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
-        </div>
-
-        <div className="flex flex-col mb-5 gap-2">
-          <label htmlFor="description" className="text-sm text-neutral-700">
-            Description
-          </label>
-          <textarea
-            {...register("description")}
-            id="description"
-            rows={10}
-            cols={60}
-            className="border rounded-md border-neutral-500 text-sm p-2 pl-3 resize-none"
-          />
-          {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
-        </div>
-
-        <div className="flex flex-col mb-5 gap-2">
-          <label htmlFor="productType" className="text-sm text-neutral-700">
-            Type
-          </label>
-          <input
-            {...register("productType")}
-            id="productType"
-            type="text"
-            className="border rounded-md border-neutral-500 text-sm p-2 pl-3"
-          />
-          {errors.productType && <p className="text-red-500 text-sm">{errors.productType.message}</p>}
-        </div>
-
-        <div className="flex flex-col mb-5 gap-2">
-          <label htmlFor="brand" className="text-sm text-neutral-700">
-            Brand
-          </label>
-          <input
-            {...register("brand")}
-            id="brand"
-            type="text"
-            className="border rounded-md border-neutral-500 text-sm p-2 pl-3"
-          />
-        </div>
-      </div>
+    <div className="flex flex-col gap-4">
+      <ProductForm id={"product-form-update"} register={register} onSubmit={handleSubmit(onSubmit)} errors={errors} />
 
       <div className="bg-white p-4 rounded-xl shadow-sm">
         <p className="font-semibold text-sm mb-2">Variants</p>
@@ -162,6 +110,7 @@ export default function ProductPageUpdateForm({ productData }: propType) {
         </button>
 
         <button
+          form="product-form-update"
           type="submit"
           disabled={!isDirty || isLoading}
           className={`${
@@ -183,6 +132,6 @@ export default function ProductPageUpdateForm({ productData }: propType) {
           />
         </Modal>
       )}
-    </form>
+    </div>
   );
 }
