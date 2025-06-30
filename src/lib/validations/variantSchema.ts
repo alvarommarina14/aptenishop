@@ -1,64 +1,24 @@
 import { z } from "zod";
 
 export const createVariantSchema = z.object({
-  sku: z.string().min(1, "SKU is required"),
-
+  sku: z.string().optional(),
   price: z.preprocess(
-    (val) => {
-      if (typeof val === "string") {
-        const normalized = val.replace(",", ".");
-        const parsed = Number(normalized);
-        return isNaN(parsed) ? undefined : parsed;
-      }
-      return val;
-    },
-    z
-      .number({
-        invalid_type_error: "Price must be a number",
-      })
-      .positive("Price must be a positive number"),
+    (val) => (typeof val === "string" ? Number(val.replace(",", ".")) : val),
+    z.number().positive().optional(),
   ),
-
-  compareAtPrice: z
-    .preprocess(
-      (val) => {
-        if (typeof val === "string") {
-          const normalized = val.replace(",", ".");
-          const parsed = Number(normalized);
-          return isNaN(parsed) ? undefined : parsed;
-        }
-        return val;
-      },
-      z.number({
-        invalid_type_error: "Compare at price must be a number",
-      }),
-    )
-    .optional(),
-
+  compareAtPrice: z.preprocess(
+    (val) => (typeof val === "string" ? Number(val.replace(",", ".")) : val),
+    z.number().optional(),
+  ),
   stock: z.preprocess(
-    (val) => (val === "" || val === null || val === undefined ? undefined : Number(val)),
-    z
-      .number({
-        invalid_type_error: "Stock is required",
-      })
-      .int("Stock must be an integer")
-      .nonnegative("Stock must be a non-negative integer"),
+    (val) => (val === "" || val == null ? undefined : Number(val)),
+    z.number().int().nonnegative().optional(),
   ),
-
   isAvailable: z.boolean().optional(),
-
-  productId: z.number().int().positive("product Id is required and must be a positive integer").optional(),
-
+  productId: z.number().int().positive(),
   images: z.any().optional(),
-
-  attributes: z
-    .array(
-      z.object({
-        value: z.string().min(1, "Attribute value is required"),
-        attributeId: z.number().int().positive("attributeId must be a positive integer"),
-      }),
-    )
-    .optional(),
 });
+
+export const createVariantsSchema = z.array(createVariantSchema);
 
 export const updateVariantSchema = createVariantSchema.partial();
