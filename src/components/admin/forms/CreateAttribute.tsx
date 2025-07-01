@@ -43,8 +43,6 @@ export default function AttributesForm({ onClose, productReference }: Attributes
         values: nonEmptyValues,
       };
 
-      console.log(fullData);
-
       await createVariantAttibutes(fullData);
       router.refresh();
     } catch (error) {
@@ -65,7 +63,7 @@ export default function AttributesForm({ onClose, productReference }: Attributes
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="rounded-md border border-neutral-200 pl-12 pt-4 pr-4 my-2">
+    <form onSubmit={handleSubmit(onSubmit)} className=" pl-12 pt-4 pr-4">
       <div className="flex flex-col mb-4 gap-2">
         <label className="text-sm text-neutral-700">Option name</label>
         <input
@@ -101,6 +99,7 @@ export default function AttributesForm({ onClose, productReference }: Attributes
       <div className="flex justify-between text-xs mb-4">
         <button
           type="button"
+          onClick={onClose}
           className="border border-neutral-200 shadow-md p-2 rounded-md bg-white hover:bg-gray-50 text-red-800 cursor-pointer"
         >
           Delete

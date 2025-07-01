@@ -10,9 +10,7 @@ import { Plus, CirclePlus, LoaderCircle } from "lucide-react";
 import { Product } from "@/types";
 import { updateProduct, deleteProduct } from "@/lib/actions/products";
 import { updateProductSchema, ProductFormUpdateInputs } from "@/lib/validations/admin/productFormSchema";
-import { generateRows } from "@/lib/helpers";
 
-import Table from "@/components/admin/Table";
 import Modal from "@/components/Modal";
 import ConfirmModal from "@/components/admin/ConfirmModal";
 import Link from "next/link";
@@ -29,15 +27,6 @@ export default function ProductPageUpdateForm({ productData }: propType) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const variants = productData?.variants.length > 0 ? productData?.variants : null;
-  const columns = variants
-    ? [
-        { key: "sku", label: "Variant SKU", hide: false },
-        { key: "price", label: "Price", hide: false },
-        { key: "stock", label: "Available", hide: false },
-        { key: "id", label: "id", hide: true },
-      ]
-    : [];
-  const rows = variants ? generateRows(variants, columns, true, false) : [];
 
   const {
     register,
@@ -102,7 +91,7 @@ export default function ProductPageUpdateForm({ productData }: propType) {
               </Link>
             )}
           </div>
-          {!isOpenForm && (
+          {!isOpenForm && productData.productAttributes.length < 1 && (
             <button
               type="button"
               className="text-sm flex gap-2 items-center p-2 my-2 hover:bg-gray-100 cursor-pointer rounded-md"
@@ -114,9 +103,59 @@ export default function ProductPageUpdateForm({ productData }: propType) {
               Add options like size or color
             </button>
           )}
-          {isOpenForm && <AttributesForm productReference={productData.id} onClose={() => setIsOpenForm(false)} />}
-          {variants && (
-            <Table acceptImage columns={columns} rows={rows} redirect={`/admin/products/${productData.id}/variants`} />
+          {productData.productAttributes.length > 0 && (
+            <div className="border border-neutral-200 rounded-md my-4">
+              {productData.productAttributes.map((attr) => {
+                const valuesForAttribute = new Set<string>();
+
+                variants?.forEach((variant) => {
+                  variant.variantValues.forEach((vv) => {
+                    if (vv.attributeValue.attributeId === attr.attributeId) {
+                      valuesForAttribute.add(vv.attributeValue.value);
+                    }
+                  });
+                });
+
+                return (
+                  <div className="border-b border-neutral-200" key={attr.id}>
+                    <button
+                      type="button"
+                      onClick={() => setIsOpenForm(true)}
+                      className="w-full hover:bg-gray-100 text-start p-4 cursor-pointer"
+                    >
+                      <p className="font-semibold text-sm">{attr.attribute.name}</p>
+                      {[...valuesForAttribute].map((val, i) => (
+                        <span key={i} className="inline-block mr-2 text-sm text-gray-700 bg-gray-200 p-1 rounded-md">
+                          {val}
+                        </span>
+                      ))}
+                    </button>
+                  </div>
+                );
+              })}
+              {productData.productAttributes.length < 3 && (
+                <>
+                  {isOpenForm ? (
+                    <AttributesForm productReference={productData.id} onClose={() => setIsOpenForm(false)} />
+                  ) : (
+                    <button
+                      type="button"
+                      className="text-sm w-full flex gap-2 items-center p-2 hover:bg-gray-100 cursor-pointer rounded-md"
+                      onClick={() => setIsOpenForm(true)}
+                    >
+                      <span>
+                        <CirclePlus className="w-4 h-4" />
+                      </span>
+                      Add another options
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {isOpenForm && productData.productAttributes.length < 1 && (
+            <AttributesForm productReference={productData.id} onClose={() => setIsOpenForm(false)} />
           )}
         </div>
 
