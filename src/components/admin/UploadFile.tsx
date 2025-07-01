@@ -3,12 +3,13 @@ import { useRouter } from 'next/navigation';
 
 import { UseFormSetValue } from 'react-hook-form';
 import { Plus } from 'lucide-react';
-import { CreateVariantForm, VariantImage } from '@/types';
+import { CreateVariantFormType, VariantImage } from '@/types';
 import { deleteVariantImages } from '@/lib/actions/variantImages';
 import Image from 'next/image';
+import { Image as ImageIcon } from 'lucide-react';
 
 type UploadFileProps = {
-    setValue: UseFormSetValue<CreateVariantForm>;
+    setValue: UseFormSetValue<CreateVariantFormType>;
     variantImages?: VariantImage[];
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -118,15 +119,16 @@ export default function UploadFile({
 
             {images.length === 0 ? (
                 <div className="mt-2 min-w-[400px] w-full bg-gray-100 h-[200px] border-dashed border-neutral-700 border rounded-md flex flex-col items-center justify-center">
+                    <ImageIcon></ImageIcon>
+                    <p className="text-xs text-neutral-700 my-2">
+                        Drag and drop any image here
+                    </p>
                     <label
                         htmlFor="file-upload"
-                        className="bg-white hover:bg-gray-50 rounded-md text-xs font-semibold p-2 shadow-md cursor-pointer"
+                        className="bg-white hover:bg-gray-50 rounded-md text-xs font-semibold p-2 shadow-md/30 cursor-pointer"
                     >
-                        Upload new
+                        Browse files
                     </label>
-                    <p className="text-xs text-neutral-700 mt-2">
-                        Only accepts images
-                    </p>
                 </div>
             ) : (
                 <div className="grid grid-cols-3 gap-2 mt-2 max-w-full">

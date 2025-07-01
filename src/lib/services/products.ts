@@ -1,54 +1,54 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 
 export async function GetAllProducts() {
-  return prisma.product.findMany({
-    include: {
-      productAttributes: {
+    return prisma.product.findMany({
         include: {
-          attribute: true,
-        },
-      },
-      variants: {
-        include: {
-          images: true,
-          variantValues: {
-            include: {
-              attributeValue: {
+            productAttributes: {
                 include: {
-                  attribute: true,
+                    attribute: true,
                 },
-              },
             },
-          },
+            variants: {
+                include: {
+                    images: true,
+                    variantValues: {
+                        include: {
+                            attributeValue: {
+                                include: {
+                                    attribute: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-      },
-    },
-  });
+    });
 }
 
 export async function GetProductById(id: number) {
-  return prisma.product.findUnique({
-    where: { id },
-    include: {
-      productAttributes: {
+    return prisma.product.findUnique({
+        where: { id },
         include: {
-          attribute: true,
-        },
-      },
-      variants: {
-        include: {
-          images: true,
-          variantValues: {
-            include: {
-              attributeValue: {
+            productAttributes: {
                 include: {
-                  attribute: true,
+                    attribute: true,
                 },
-              },
             },
-          },
+            variants: {
+                include: {
+                    images: true,
+                    variantValues: {
+                        include: {
+                            attributeValue: {
+                                include: {
+                                    attribute: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-      },
-    },
-  });
+    });
 }

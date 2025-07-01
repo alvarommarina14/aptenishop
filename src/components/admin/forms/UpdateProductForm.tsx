@@ -25,7 +25,7 @@ type propType = {
     productData: Product;
 };
 
-export default function ProductPageUpdateForm({ productData }: propType) {
+export default function UpdateProductForm({ productData }: propType) {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);

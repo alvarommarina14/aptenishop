@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useForm } from 'react-hook-form';
@@ -8,63 +8,48 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { LoaderCircle } from 'lucide-react';
 
-import { CreateVariantForm, Variant } from '@/types';
+import { CreateVariantFormType } from '@/types';
 import { uploadImagesToCloudinary } from '@/lib/actions/cloudinary';
 import { createVariantImages } from '@/lib/actions/variantImages';
-import { updateVariant, deleteVariant } from '@/lib/actions/variants';
-import { updateVariantSchema } from '@/lib/validations/variantSchema';
+import { createVariant } from '@/lib/actions/variants';
+import { createVariantSchema } from '@/lib/validations/variantSchema';
 
 import UploadFile from '@/components/admin/UploadFile';
-import Modal from '@/components/Modal';
-import ConfirmModal from '@/components/admin/ConfirmModal';
 
 type PropsType = {
-    productReference: number;
-    activeVariant: Variant;
+    productReference: { productId: string };
 };
 
-export default function VariantPageUpdateForm({
-    productReference,
-    activeVariant,
-}: PropsType) {
-    const router = useRouter();
-    const [isOpen, setIsOpen] = useState(false);
+export default function CreateVariantForm({ productReference }: PropsType) {
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
     const {
         register,
         setValue,
         handleSubmit,
-        formState: { errors, isDirty },
-    } = useForm<CreateVariantForm>({
-        resolver: zodResolver(updateVariantSchema),
-        defaultValues: {
-            price: activeVariant.price,
-            compareAtPrice: activeVariant.compareAtPrice,
-            sku: activeVariant.sku!,
-            stock: activeVariant.stock,
-        },
+        formState: { errors },
+    } = useForm<CreateVariantFormType>({
+        resolver: zodResolver(createVariantSchema),
     });
+    useEffect(() => {
+        if (productReference?.productId) {
+            setValue('productId', parseInt(productReference.productId));
+        }
+    }, [productReference, setValue]);
 
-    const onSubmit = async (data: CreateVariantForm) => {
+    const onSubmit = async (data: CreateVariantFormType) => {
         setIsLoading(true);
         const { images, ...restData } = data;
-
         try {
             const files = images ? (images as File[]) : null;
             const uploadedImages = await uploadImagesToCloudinary(files);
-
             const dataCompleted = {
                 ...restData,
                 isAvailable:
                     typeof data.stock == 'number' ? data.stock > 0 : false,
-                productId: productReference,
+                productId: parseInt(productReference.productId),
             };
-
-            const variant = await updateVariant(
-                dataCompleted,
-                activeVariant.id
-            );
-
+            const variant = await createVariant(dataCompleted);
             const imagesFormatted = uploadedImages?.map((img) => ({
                 url: img.url,
                 publicId: img.publicId,
@@ -74,40 +59,26 @@ export default function VariantPageUpdateForm({
             if (imagesFormatted?.length) {
                 await createVariantImages(imagesFormatted);
             }
-            router.refresh();
-            setIsLoading(false);
+
+            router.push(
+                `/admin/products/${productReference.productId}/variants/${variant.id}`
+            );
         } catch (error) {
             setIsLoading(false);
-            console.error(error);
-        }
-    };
-
-    const handleDelete = async () => {
-        setIsLoading(true);
-
-        try {
-            await deleteVariant(activeVariant.id);
-            router.push(`/admin/products/${productReference}`);
-        } catch (error) {
-            setIsLoading(false);
-            console.error(error);
+            // to implement a toast notification system
         }
     };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-            <UploadFile
-                setValue={setValue}
-                variantImages={activeVariant.images}
-                setIsLoading={setIsLoading}
-            />
+            <UploadFile setValue={setValue} setIsLoading={setIsLoading} />
             <div className="bg-white p-4 rounded-xl shadow-sm">
                 <h2 className="font-semibold mb-2">Pricing</h2>
                 <div className="flex justify-between gap-4">
                     <div className="flex flex-col mb-5 gap-2 w-full">
                         <label
                             htmlFor="price"
-                            className="text-sm text-neutral-700"
+                            className="text-sm text-neutral-700 required-label"
                         >
                             Price
                         </label>
@@ -146,6 +117,7 @@ export default function VariantPageUpdateForm({
                                 {...register('compareAtPrice', {
                                     valueAsNumber: true,
                                 })}
+                                defaultValue="0.00"
                                 id="compareAtPrice"
                                 type="text"
                                 inputMode="decimal"
@@ -164,7 +136,10 @@ export default function VariantPageUpdateForm({
             <div className="bg-white p-4 rounded-xl shadow-sm">
                 <h2 className="font-semibold mb-2">Inventory</h2>
                 <div className="flex flex-col mb-5 gap-2">
-                    <label htmlFor="sku" className="text-sm text-neutral-700">
+                    <label
+                        htmlFor="sku"
+                        className="text-sm text-neutral-700 required-label"
+                    >
                         {`SKU (Stock Keeping Unit)`}
                     </label>
                     <input
@@ -186,6 +161,7 @@ export default function VariantPageUpdateForm({
                     </label>
                     <input
                         {...register('stock', { valueAsNumber: true })}
+                        defaultValue={'0'}
                         id="stock"
                         type="number"
                         className="border rounded-md border-neutral-500 text-sm p-2 pl-3"
@@ -198,41 +174,21 @@ export default function VariantPageUpdateForm({
                 </div>
             </div>
 
-            <div className="flex items-center justify-end gap-4">
-                <button
-                    type="button"
-                    className="text-sm cursor-pointer text-red-800 font-medium hover:underline"
-                    onClick={() => setIsOpen(true)}
-                >
-                    Delete variant
-                </button>
-
-                <button
-                    type="submit"
-                    disabled={isLoading || !isDirty}
-                    className={`${
-                        isLoading || !isDirty
-                            ? 'bg-neutral-400 cursor-default'
-                            : 'bg-neutral-700 hover:bg-neutral-800 cursor-pointer'
-                    } text-white text-sm p-2 rounded-md`}
-                >
-                    {isLoading ? (
-                        <LoaderCircle className="animate-spin" />
-                    ) : (
-                        <span>Save</span>
-                    )}
-                </button>
-            </div>
-            {isOpen && (
-                <Modal onClose={() => setIsOpen(false)}>
-                    <ConfirmModal
-                        entity={'variant'}
-                        entityItem={activeVariant.sku!}
-                        onClose={() => setIsOpen(false)}
-                        onTrigger={handleDelete}
-                    />
-                </Modal>
-            )}
+            <button
+                type="submit"
+                disabled={isLoading}
+                className={`${
+                    isLoading
+                        ? 'bg-neutral-400 cursor-default'
+                        : 'bg-neutral-700 hover:bg-neutral-800 cursor-pointer'
+                } text-white text-sm p-2 rounded-md self-end`}
+            >
+                {isLoading ? (
+                    <LoaderCircle className="animate-spin" />
+                ) : (
+                    <span>Save</span>
+                )}
+            </button>
         </form>
     );
 }
