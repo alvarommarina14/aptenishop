@@ -5,7 +5,7 @@ import { GetProductById } from '@/lib/services/products';
 import { Tag } from 'lucide-react';
 
 import PageTitle from '@/components/admin/PageTitle';
-import VariantPageUpdateForm from '@/components/admin/forms/UpdateVariant';
+import UpdateVariantForm from '@/components/admin/forms/UpdateVariantForm';
 import Image from 'next/image';
 
 type PropsType = {
@@ -15,6 +15,7 @@ type PropsType = {
 export default async function VariantPage({ params }: PropsType) {
     const { productId, variantId } = await params;
     const product = await GetProductById(parseInt(productId));
+
     if (!product) return <div>No product found</div>;
 
     const variants = product.variants;
@@ -36,8 +37,14 @@ export default async function VariantPage({ params }: PropsType) {
                     <div className="bg-white flex flex-col rounded-xl shadow-sm">
                         <div className="p-4 flex gap-2 pb-6 border-b border-neutral-200">
                             <Image
-                                src={activeVariant[0].images[0]?.url || ''}
-                                alt={activeVariant[0].images[0]?.altText || ''}
+                                src={
+                                    activeVariant[0].images[0]?.url ||
+                                    '/placeholder.png'
+                                } //TODO: add placeholder image
+                                alt={
+                                    activeVariant[0].images[0]?.altText ||
+                                    '/placeholder.png'
+                                } //TODO: add placeholder image
                                 width={120}
                                 height={120}
                                 className="rounded object-cover border border-neutral-200"
@@ -75,7 +82,7 @@ export default async function VariantPage({ params }: PropsType) {
                 </div>
 
                 <div className="col-start-1 row-start-3 lg:col-start-2 lg:row-start-2">
-                    <VariantPageUpdateForm
+                    <UpdateVariantForm
                         productReference={product.id}
                         activeVariant={activeVariant[0]}
                     />

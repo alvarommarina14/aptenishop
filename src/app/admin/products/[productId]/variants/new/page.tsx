@@ -1,6 +1,6 @@
 import PageTitle from '@/components/admin/PageTitle';
 import { Tag } from 'lucide-react';
-import VariantPageCreateForm from '@/components/admin/forms/CreateVariant';
+import CreateVariantForm from '@/components/admin/forms/CreateVariantForm';
 
 type PropsType = {
     params: Promise<{ productId: string }>;
@@ -14,7 +14,7 @@ export default async function ProductVariantNew({ params }: PropsType) {
         <div className="p-4 flex flex-col items-center">
             <div className="min-w-[700px]">
                 <PageTitle data={titleData} />
-                <VariantPageCreateForm productReference={productReference} />
+                <CreateVariantForm productReference={productReference} />
             </div>
         </div>
     );

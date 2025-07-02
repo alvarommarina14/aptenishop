@@ -72,8 +72,8 @@ export interface RowData {
     [key: string]: string | ImageData | undefined;
 }
 
-export interface CreateVariantForm {
-    sku?: string | undefined;
+export interface CreateVariantFormType {
+    sku: string;
     price?: unknown;
     compareAtPrice?: unknown;
     stock?: unknown;

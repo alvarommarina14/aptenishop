@@ -1,16 +1,23 @@
 import { z } from 'zod';
 
 export const createVariantSchema = z.object({
-    sku: z.string().optional(),
-    price: z.preprocess((val) => {
-        if (val === '' || val == null) {
-            return undefined;
-        }
-        if (typeof val === 'string') {
-            return Number(val.replace(',', '.'));
-        }
-        return val;
-    }, z.number().positive().optional()),
+    sku: z.string().nonempty('SKU is required'),
+    price: z.preprocess(
+        (val) => {
+            if (val === '' || val == null) {
+                return undefined;
+            }
+            if (typeof val === 'string') {
+                return Number(val.replace(',', '.'));
+            }
+            return val;
+        },
+        z
+            .number({
+                invalid_type_error: 'Please enter a valid price',
+            })
+            .positive()
+    ),
     compareAtPrice: z.preprocess((val) => {
         if (val === '' || val == null) {
             return undefined;
@@ -29,12 +36,16 @@ export const createVariantSchema = z.object({
     images: z.any().optional(),
 });
 
-export const createVariantsSchema = z.array(createVariantSchema);
+export const createVariantsSchema = z.union([
+    createVariantSchema,
+    z.array(createVariantSchema),
+]);
 
-const requiredProductIdSchema = z.object({
+const requiredProductIdAndSKUSchema = z.object({
+    sku: z.string().nonempty('SKU is required'),
     productId: z.number().int().positive(),
 });
 
 export const updateVariantSchema = createVariantSchema
     .partial()
-    .merge(requiredProductIdSchema);
+    .merge(requiredProductIdAndSKUSchema);
