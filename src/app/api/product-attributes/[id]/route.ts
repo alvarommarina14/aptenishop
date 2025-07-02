@@ -1,17 +1,23 @@
-import { NextResponse, NextRequest } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { NextResponse, NextRequest } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
-export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const id = parseInt(params.id);
+export async function DELETE(
+    _: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const id = parseInt((await params).id);
 
-    await prisma.productAttribute.delete({
-      where: { id },
-    });
+        await prisma.productAttribute.delete({
+            where: { id },
+        });
 
-    return NextResponse.json({ message: "Product attribute deleted" });
-  } catch (error) {
-    console.error("Error deleting product attribute:", error);
-    return NextResponse.json({ message: "Error deleting product attribute" }, { status: 500 });
-  }
+        return NextResponse.json({ message: 'Product attribute deleted' });
+    } catch (error) {
+        console.error('Error deleting product attribute:', error);
+        return NextResponse.json(
+            { message: 'Error deleting product attribute' },
+            { status: 500 }
+        );
+    }
 }
