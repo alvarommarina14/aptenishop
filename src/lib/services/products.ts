@@ -1,54 +1,53 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 
 export async function GetAllProducts() {
-  return prisma.product.findMany({
-    include: {
-      productAttributes: {
+    return prisma.product.findMany({
         include: {
-          attributeValues: true,
-        },
-      },
-      variants: {
-        include: {
-          images: true,
-          variantValues: {
-            include: {
-              attributeValue: {
+            productAttributes: {
                 include: {
-                  productAttribute: true,
+                    attributeValues: true,
                 },
-              },
             },
-          },
+            variants: {
+                include: {
+                    images: true,
+                    variantValues: {
+                        include: {
+                            attributeValue: {
+                                include: {
+                                    productAttribute: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-      },
-    },
-  });
+    });
 }
-
 export async function GetProductById(id: number) {
-  return prisma.product.findUnique({
-    where: { id },
-    include: {
-      productAttributes: {
+    return prisma.product.findUnique({
+        where: { id },
         include: {
-          attributeValues: true,
-        },
-      },
-      variants: {
-        include: {
-          images: true,
-          variantValues: {
-            include: {
-              attributeValue: {
+            productAttributes: {
                 include: {
-                  productAttribute: true,
+                    attributeValues: true,
                 },
-              },
             },
-          },
+            variants: {
+                include: {
+                    images: true,
+                    variantValues: {
+                        include: {
+                            attributeValue: {
+                                include: {
+                                    productAttribute: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-      },
-    },
-  });
+    });
 }

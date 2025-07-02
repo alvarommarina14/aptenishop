@@ -1,0 +1,30 @@
+name: Sync develop → staging
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout develop
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Set up Git user
+        run: |
+          git config user.name "Sync to stage"
+          git config user.email "synctostage@github.com"
+
+      - name: Push to staging
+        run: |
+          git push origin develop:staging --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

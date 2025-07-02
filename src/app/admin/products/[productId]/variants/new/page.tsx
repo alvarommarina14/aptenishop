@@ -1,21 +1,21 @@
-import PageTitle from "@/components/admin/PageTitle";
-import { Tag } from "lucide-react";
-import VariantPageCreateForm from "@/components/admin/forms/CreateVariant";
+import PageTitle from '@/components/admin/PageTitle';
+import { Tag } from 'lucide-react';
+import CreateVariantForm from '@/components/admin/forms/CreateVariantForm';
 
 type PropsType = {
-  params: { productId: string };
+    params: Promise<{ productId: string }>;
 };
 
 export default async function ProductVariantNew({ params }: PropsType) {
-  const productReference = await params;
-  const titleData = { title: "Add Variant", icon: Tag };
+    const productReference = await params;
+    const titleData = { title: 'Add Variant', icon: Tag };
 
-  return (
-    <div className="p-4 flex flex-col items-center">
-      <div className="min-w-[700px]">
-        <PageTitle data={titleData} />
-        <VariantPageCreateForm productReference={productReference} />
-      </div>
-    </div>
-  );
+    return (
+        <div className="p-4 flex flex-col items-center">
+            <div className="min-w-[700px]">
+                <PageTitle data={titleData} />
+                <CreateVariantForm productReference={productReference} />
+            </div>
+        </div>
+    );
 }
