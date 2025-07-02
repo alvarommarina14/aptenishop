@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createProductAttributeSchema } from "@/lib/validations/productValueSchema";
+import { createProductAttributeSchema } from "@/lib/validations/productAttributesSchema";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,24 +8,23 @@ export async function POST(req: NextRequest) {
     const result = createProductAttributeSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json({ errors: result.error.flatten().fieldErrors }, { status: 400 });
+      return NextResponse.json(
+        {
+          message: "Validation error",
+          errors: result.error.flatten().fieldErrors,
+        },
+        { status: 400 },
+      );
     }
 
-    const { productId, attributeIds } = result.data;
-
-    const data = attributeIds.map((attributeId) => ({
-      productId,
-      attributeId,
-    }));
-
-    const created = await prisma.productAttribute.createMany({
-      data,
-      skipDuplicates: true,
-    });
+    const created = await prisma.productAttribute.create({ data: result.data });
 
     return NextResponse.json(created, { status: 201 });
   } catch (error) {
     console.error("Error creating product attributes:", error);
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal server error", error: error instanceof Error ? error.message : error },
+      { status: 500 },
+    );
   }
 }

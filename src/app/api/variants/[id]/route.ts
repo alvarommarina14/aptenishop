@@ -17,7 +17,7 @@ export async function GET(
                     include: {
                         attributeValue: {
                             include: {
-                                attribute: true,
+                                productAttribute: true,
                             },
                         },
                     },

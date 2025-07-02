@@ -119,7 +119,7 @@ export default function UploadFile({
 
             {images.length === 0 ? (
                 <div className="mt-2 min-w-[400px] w-full bg-gray-100 h-[200px] border-dashed border-neutral-700 border rounded-md flex flex-col items-center justify-center">
-                    <ImageIcon></ImageIcon>
+                    <ImageIcon />
                     <p className="text-xs text-neutral-700 my-2">
                         Drag and drop any image here
                     </p>
@@ -148,6 +148,8 @@ export default function UploadFile({
                                         ? img.data.altText || ''
                                         : `preview ${index + 1}`
                                 }
+                                width={20}
+                                height={20}
                                 className="w-full h-40 object-contain rounded-md"
                             />
                             <input

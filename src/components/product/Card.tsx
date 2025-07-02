@@ -17,6 +17,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                         <Image
                             src={selectedVariant.images[0].url}
                             alt={selectedVariant.images[0].altText ?? undefined}
+                            width={20}
+                            height={20}
                         />
                     )}
             </div>

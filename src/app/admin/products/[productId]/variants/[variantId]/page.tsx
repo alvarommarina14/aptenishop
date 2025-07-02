@@ -72,6 +72,8 @@ export default async function VariantPage({ params }: PropsType) {
                                     <Image
                                         src={variant.images[0].url}
                                         alt={variant.images[0].altText || ''}
+                                        width={20}
+                                        height={20}
                                         className="h-12 w-12 rounded object-cover border border-neutral-200"
                                     />
                                 )}

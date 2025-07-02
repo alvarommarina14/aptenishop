@@ -5,7 +5,7 @@ export async function GetAllProducts() {
         include: {
             productAttributes: {
                 include: {
-                    attribute: true,
+                    attributeValues: true,
                 },
             },
             variants: {
@@ -15,7 +15,7 @@ export async function GetAllProducts() {
                         include: {
                             attributeValue: {
                                 include: {
-                                    attribute: true,
+                                    productAttribute: true,
                                 },
                             },
                         },
@@ -25,14 +25,13 @@ export async function GetAllProducts() {
         },
     });
 }
-
 export async function GetProductById(id: number) {
     return prisma.product.findUnique({
         where: { id },
         include: {
             productAttributes: {
                 include: {
-                    attribute: true,
+                    attributeValues: true,
                 },
             },
             variants: {
@@ -42,7 +41,7 @@ export async function GetProductById(id: number) {
                         include: {
                             attributeValue: {
                                 include: {
-                                    attribute: true,
+                                    productAttribute: true,
                                 },
                             },
                         },

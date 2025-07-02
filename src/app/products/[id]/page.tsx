@@ -26,6 +26,8 @@ export default async function Product({ params }: Props) {
                             alt={
                                 selectedVariant.images[0].altText! ?? undefined
                             }
+                            height={20}
+                            width={20}
                         />
                     </div>
                     <div>
