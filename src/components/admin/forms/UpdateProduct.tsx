@@ -106,16 +106,6 @@ export default function ProductPageUpdateForm({ productData }: propType) {
           {productData.productAttributes.length > 0 && (
             <div className="border border-neutral-200 rounded-md my-4">
               {productData.productAttributes.map((attr) => {
-                const valuesForAttribute = new Set<string>();
-
-                variants?.forEach((variant) => {
-                  variant.variantValues.forEach((vv) => {
-                    if (vv.attributeValue.attributeId === attr.attributeId) {
-                      valuesForAttribute.add(vv.attributeValue.value);
-                    }
-                  });
-                });
-
                 return (
                   <div className="border-b border-neutral-200" key={attr.id}>
                     <button
@@ -123,12 +113,17 @@ export default function ProductPageUpdateForm({ productData }: propType) {
                       onClick={() => setIsOpenForm(true)}
                       className="w-full hover:bg-gray-100 text-start p-4 cursor-pointer"
                     >
-                      <p className="font-semibold text-sm">{attr.attribute.name}</p>
-                      {[...valuesForAttribute].map((val, i) => (
-                        <span key={i} className="inline-block mr-2 text-sm text-gray-700 bg-gray-200 p-1 rounded-md">
-                          {val}
-                        </span>
-                      ))}
+                      <p className="font-semibold text-sm">{attr.name}</p>
+                      {attr.attributeValues.map((val) => {
+                        return (
+                          <span
+                            key={val.id}
+                            className="inline-block mr-2 text-sm text-gray-700 bg-gray-200 p-1 rounded-md"
+                          >
+                            {val.value}
+                          </span>
+                        );
+                      })}
                     </button>
                   </div>
                 );

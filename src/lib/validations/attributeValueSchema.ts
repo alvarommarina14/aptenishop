@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createAttributeValueSchema = z.object({
-  attributeId: z.number().optional(),
+  productAttributeId: z.number().optional(),
   values: z
     .array(
       z.object({

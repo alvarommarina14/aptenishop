@@ -14,7 +14,7 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
           include: {
             attributeValue: {
               include: {
-                attribute: true,
+                productAttribute: true,
               },
             },
           },

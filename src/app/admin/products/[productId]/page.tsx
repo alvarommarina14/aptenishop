@@ -16,6 +16,7 @@ export default async function Product({ params }: Props) {
   }
 
   const titleData = { title: product.name, icon: Tag };
+  console.log(product);
 
   return (
     <div className="p-4 flex flex-col items-center ">

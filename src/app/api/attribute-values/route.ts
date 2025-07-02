@@ -17,8 +17,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const formattedData = result.data.flatMap((item) =>
+      item.values.map((v) => ({
+        value: v.value,
+        productAttributeId: item.productAttributeId!,
+      })),
+    );
+
     await prisma.attributeValue.createMany({
-      data: result.data,
+      data: formattedData,
       skipDuplicates: true,
     });
 
