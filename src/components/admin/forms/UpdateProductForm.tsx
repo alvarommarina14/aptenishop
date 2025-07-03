@@ -87,9 +87,9 @@ export default function UpdateProductForm({ productData }: propType) {
                 errors={errors}
             />
 
-            <div className="flex flex-col gap-4 mt-4">
-                <div className="bg-white p-4 rounded-xl shadow-sm">
-                    <div className="flex justify-between items-center">
+            <div className="flex flex-col mt-4">
+                <div className="bg-white border border-neutral-200 rounded-xl">
+                    <div className="flex justify-between items-center p-4">
                         <p className="font-semibold text-sm">Variants</p>
                         {variants && (
                             <Link
@@ -107,7 +107,7 @@ export default function UpdateProductForm({ productData }: propType) {
                         productData.productAttributes.length < 1 && (
                             <button
                                 type="button"
-                                className="text-sm flex gap-2 items-center p-2 my-2 hover:bg-gray-100 cursor-pointer rounded-md"
+                                className="text-sm flex gap-2 items-center p-2 m-4 mt-0 hover:bg-gray-100 cursor-pointer rounded-md"
                                 onClick={() => setIsOpenForm(true)}
                             >
                                 <span>
@@ -117,7 +117,7 @@ export default function UpdateProductForm({ productData }: propType) {
                             </button>
                         )}
                     {productData.productAttributes.length > 0 && (
-                        <div className="border border-neutral-200 rounded-md my-4">
+                        <div className="border border-neutral-200 rounded-md m-4 mt-0">
                             {productData.productAttributes.map((attr) => {
                                 return (
                                     <div
@@ -176,9 +176,38 @@ export default function UpdateProductForm({ productData }: propType) {
                             onClose={() => setIsOpenForm(false)}
                         />
                     )}
+                    <div className="w-full border-t border-neutral-200 overflow-hidden mt-8 rounded-b-xl">
+                        <div className="grid grid-cols-3 bg-gray-100 px-4 py-2 text-sm font-medium text-neutral-700 border-b border-neutral-200">
+                            <p className="text-left">Variant</p>
+                            <p className="text-center">Price</p>
+                            <p className="text-right">Available</p>
+                        </div>
+
+                        {variants?.map((v) => (
+                            <div
+                                key={v.id}
+                                className="grid grid-cols-3 px-4 py-3 text-sm border-b border-neutral-100 hover:bg-gray-50 transition"
+                            >
+                                <Link
+                                    href={`/admin/products/${productData.id}/variants/${v.id}`}
+                                    className="text-left text-neutral-800 hover:underline"
+                                >
+                                    {v.variantValues
+                                        .map((vv) => vv.attributeValue.value)
+                                        .join(' / ')}
+                                </Link>
+                                <p className="text-center text-neutral-800">
+                                    ${v.price}
+                                </p>
+                                <p className="text-right text-neutral-800">
+                                    {v.stock}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-4">
+                <div className="flex items-center justify-end gap-4 mt-4">
                     <button
                         type="button"
                         className="text-sm cursor-pointer text-red-800 font-medium hover:underline"

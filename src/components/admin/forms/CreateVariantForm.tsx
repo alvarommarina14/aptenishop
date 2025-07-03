@@ -28,7 +28,7 @@ export default function CreateVariantForm({ productReference }: PropsType) {
         setValue,
         handleSubmit,
         formState: { errors },
-    } = useForm<CreateVariantFormType>({
+    } = useForm({
         resolver: zodResolver(createVariantSchema),
     });
     useEffect(() => {

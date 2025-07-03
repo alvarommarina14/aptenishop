@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { LoaderCircle } from 'lucide-react';
 
-import { CreateVariantFormType, Variant } from '@/types';
+import { UpdateVariantFormType, Variant } from '@/types';
 import { uploadImagesToCloudinary } from '@/lib/actions/cloudinary';
 import { createVariantImages } from '@/lib/actions/variantImages';
 import { updateVariant, deleteVariant } from '@/lib/actions/variants';
@@ -35,7 +35,7 @@ export default function UpdateVariantForm({
         setValue,
         handleSubmit,
         formState: { errors, isDirty },
-    } = useForm<CreateVariantFormType>({
+    } = useForm({
         resolver: zodResolver(updateVariantSchema),
         defaultValues: {
             price: activeVariant.price,
@@ -45,7 +45,7 @@ export default function UpdateVariantForm({
         },
     });
 
-    const onSubmit = async (data: CreateVariantFormType) => {
+    const onSubmit = async (data: UpdateVariantFormType) => {
         setIsLoading(true);
         const { images, ...restData } = data;
 
