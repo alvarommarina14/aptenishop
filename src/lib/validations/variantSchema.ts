@@ -32,8 +32,16 @@ export const createVariantSchema = z.object({
         z.number().int().nonnegative().optional()
     ),
     isAvailable: z.boolean().optional(),
-    productId: z.number().int().positive().optional(),
+    productId: z.number().int().positive(),
     images: z.any().optional(),
+    variantValues: z
+        .array(
+            z.object({
+                attributeId: z.number().int().positive(),
+                attributeValueId: z.number().int().positive(),
+            })
+        )
+        .optional(),
 });
 
 export const createVariantsSchema = z.union([

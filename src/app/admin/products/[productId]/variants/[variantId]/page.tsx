@@ -30,8 +30,6 @@ export default async function VariantPage({ params }: PropsType) {
         icon: Tag,
     };
 
-    console.log(variants);
-
     return (
         <div className="p-4 flex justify-center">
             <div className="grid grid-cols-1 lg:grid-cols-[300px_700px] auto-rows-max gap-4">

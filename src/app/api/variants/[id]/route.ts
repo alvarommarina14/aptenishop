@@ -57,10 +57,30 @@ export async function PUT(
         }
 
         const id = parseInt((await params).id);
+        const { variantValues, productId, ...rest } = result.data;
+
+        const updateData: any = {
+            ...rest,
+        };
+
+        if (typeof productId === 'number') {
+            updateData.product = {
+                connect: { id: productId },
+            };
+        }
+
+        if (variantValues && variantValues.length > 0) {
+            updateData.variantValues = {
+                deleteMany: {},
+                create: variantValues.map((vv) => ({
+                    attributeValueId: vv.attributeValueId,
+                })),
+            };
+        }
 
         const updated = await prisma.variant.update({
             where: { id },
-            data: result.data,
+            data: updateData,
         });
 
         return NextResponse.json(updated);

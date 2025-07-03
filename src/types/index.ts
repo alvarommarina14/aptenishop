@@ -19,7 +19,7 @@ export interface Product {
 export interface Variant {
     id: number;
     sku?: string | null;
-    price?: number | null;
+    price?: number | null | string;
     compareAtPrice?: number | null;
     stock?: number | null;
     isAvailable?: boolean | null;
