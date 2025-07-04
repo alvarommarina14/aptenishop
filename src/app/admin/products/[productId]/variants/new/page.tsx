@@ -17,7 +17,7 @@ export default async function ProductVariantNew({ params }: PropsType) {
             <div className="min-w-[700px]">
                 <PageTitle data={titleData} />
                 <CreateVariantForm
-                    productReference={productReference}
+                    productReference={parseInt(productReference.productId)}
                     productAttributes={product?.productAttributes}
                 />
             </div>

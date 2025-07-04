@@ -91,7 +91,7 @@ export default function UpdateProductForm({ productData }: propType) {
                 <div className="bg-white border border-neutral-200 rounded-xl">
                     <div className="flex justify-between items-center p-4">
                         <p className="font-semibold text-sm">Variants</p>
-                        {variants && (
+                        {productData.productAttributes.length > 0 && (
                             <Link
                                 href={`/admin/products/${productData.id}/variants/new`}
                                 className="text-xs flex gap-1 items-center bg-white hover:bg-gray-100 w-fit p-2 rounded-md border border-neutral-200 shadow-sm"
@@ -176,35 +176,39 @@ export default function UpdateProductForm({ productData }: propType) {
                             onClose={() => setIsOpenForm(false)}
                         />
                     )}
-                    <div className="w-full border-t border-neutral-200 overflow-hidden mt-8 rounded-b-xl">
-                        <div className="grid grid-cols-3 bg-gray-100 px-4 py-2 text-sm font-medium text-neutral-700 border-b border-neutral-200">
-                            <p className="text-left">Variant</p>
-                            <p className="text-center">Price</p>
-                            <p className="text-right">Available</p>
-                        </div>
-
-                        {variants?.map((v) => (
-                            <div
-                                key={v.id}
-                                className="grid grid-cols-3 px-4 py-3 text-sm border-b border-neutral-100 hover:bg-gray-50 transition"
-                            >
-                                <Link
-                                    href={`/admin/products/${productData.id}/variants/${v.id}`}
-                                    className="text-left text-neutral-800 hover:underline"
-                                >
-                                    {v.variantValues
-                                        .map((vv) => vv.attributeValue.value)
-                                        .join(' / ')}
-                                </Link>
-                                <p className="text-center text-neutral-800">
-                                    ${v.price}
-                                </p>
-                                <p className="text-right text-neutral-800">
-                                    {v.stock}
-                                </p>
+                    {productData.variants.length > 0 && (
+                        <div className="w-full border-t border-neutral-200 overflow-hidden mt-8 rounded-b-xl">
+                            <div className="grid grid-cols-3 bg-gray-100 px-4 py-2 text-sm font-medium text-neutral-700 border-b border-neutral-200">
+                                <p className="text-left">Variant</p>
+                                <p className="text-center">Price</p>
+                                <p className="text-right">Available</p>
                             </div>
-                        ))}
-                    </div>
+
+                            {variants?.map((v) => (
+                                <div
+                                    key={v.id}
+                                    className="grid grid-cols-3 px-4 py-3 text-sm border-b border-neutral-100 hover:bg-gray-50 transition"
+                                >
+                                    <Link
+                                        href={`/admin/products/${productData.id}/variants/${v.id}`}
+                                        className="text-left text-neutral-800 hover:underline"
+                                    >
+                                        {v.variantValues
+                                            .map(
+                                                (vv) => vv.attributeValue.value
+                                            )
+                                            .join(' / ')}
+                                    </Link>
+                                    <p className="text-center text-neutral-800">
+                                        ${v.price}
+                                    </p>
+                                    <p className="text-right text-neutral-800">
+                                        {v.stock}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex items-center justify-end gap-4 mt-4">

@@ -19,7 +19,7 @@ import UploadFile from '@/components/admin/UploadFile';
 import ChooseOptions from '@/components/admin/ChooseOptions';
 
 type PropsType = {
-    productReference: { productId: string };
+    productReference: number;
     productAttributes: ProductAttribute[] | undefined;
 };
 
@@ -38,6 +38,7 @@ export default function CreateVariantForm({
     } = useForm({
         resolver: zodResolver(createVariantSchema),
         defaultValues: {
+            productId: productReference,
             variantValues: productAttributes.map((attr) => ({
                 attributeId: attr.id,
                 attributeValueId: attr.attributeValues[0]?.id ?? 0,
@@ -47,20 +48,15 @@ export default function CreateVariantForm({
 
     const onSubmit = async (data: CreateVariantFormType) => {
         setIsLoading(true);
-        const { images, sku, price, stock, compareAtPrice, variantValues } =
-            data;
+        const { images, variantValues, ...restData } = data;
 
         try {
             const files = images ? (images as File[]) : null;
             const uploadedImages = await uploadImagesToCloudinary(files);
             const dataCompleted = {
-                sku,
-                price,
-                compareAtPrice,
-                stock,
+                ...restData,
                 isAvailable:
                     typeof data.stock == 'number' ? data.stock > 0 : false,
-                productId: parseInt(productReference.productId),
             };
             const variant: Variant = await createVariant(dataCompleted);
             const newArray = variantValues?.map(({ attributeValueId }) => ({
@@ -77,7 +73,7 @@ export default function CreateVariantForm({
                 await createVariantImages(imagesFormatted);
             }
             router.push(
-                `/admin/products/${productReference.productId}/variants/${variant.id}`
+                `/admin/products/${productReference}/variants/${variant.id}`
             );
         } catch (error) {
             setIsLoading(false);
