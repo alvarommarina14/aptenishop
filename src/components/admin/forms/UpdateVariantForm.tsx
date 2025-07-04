@@ -8,23 +8,27 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { LoaderCircle } from 'lucide-react';
 
-import { UpdateVariantFormType, Variant } from '@/types';
+import { UpdateVariantFormType, Variant, ProductAttribute } from '@/types';
 import { uploadImagesToCloudinary } from '@/lib/actions/cloudinary';
 import { createVariantImages } from '@/lib/actions/variantImages';
 import { updateVariant, deleteVariant } from '@/lib/actions/variants';
+import { updateVariantValues } from '@/lib/actions/variantValues';
 import { updateVariantSchema } from '@/lib/validations/variantSchema';
 
 import UploadFile from '@/components/admin/UploadFile';
 import Modal from '@/components/Modal';
 import ConfirmModal from '@/components/admin/ConfirmModal';
+import ChooseOptions from '@/components/admin/ChooseOptions';
 
 type PropsType = {
     productReference: number;
+    productAttributes: ProductAttribute[] | undefined;
     activeVariant: Variant;
 };
 
 export default function UpdateVariantForm({
     productReference,
+    productAttributes = [],
     activeVariant,
 }: PropsType) {
     const router = useRouter();
@@ -33,6 +37,7 @@ export default function UpdateVariantForm({
     const {
         register,
         setValue,
+        getValues,
         handleSubmit,
         formState: { errors, isDirty },
     } = useForm({
@@ -42,35 +47,48 @@ export default function UpdateVariantForm({
             compareAtPrice: activeVariant.compareAtPrice,
             sku: activeVariant.sku!,
             stock: activeVariant.stock,
+            variantValues: productAttributes.map((attr) => {
+                const match = activeVariant.variantValues.find(
+                    (v) => v.attributeValue.productAttributeId === attr.id
+                );
+                return {
+                    attributeId: attr.id,
+                    attributeValueId:
+                        match?.attributeValueId ??
+                        attr.attributeValues[0]?.id ??
+                        0,
+                };
+            }),
         },
     });
 
     const onSubmit = async (data: UpdateVariantFormType) => {
         setIsLoading(true);
-        const { images, ...restData } = data;
+        const { images, variantValues, ...restData } = data;
 
         try {
             const files = images ? (images as File[]) : null;
             const uploadedImages = await uploadImagesToCloudinary(files);
-
             const dataCompleted = {
                 ...restData,
                 isAvailable:
                     typeof data.stock == 'number' ? data.stock > 0 : false,
                 productId: productReference,
             };
-
             const variant = await updateVariant(
                 dataCompleted,
                 activeVariant.id
             );
+            const variantValuesToupdate = {
+                variantValues: variantValues,
+            };
 
+            await updateVariantValues(variantValuesToupdate, activeVariant.id);
             const imagesFormatted = uploadedImages?.map((img) => ({
                 url: img.url,
                 publicId: img.publicId,
                 variantId: parseInt(variant.id),
             }));
-
             if (imagesFormatted?.length) {
                 await createVariantImages(imagesFormatted);
             }
@@ -96,6 +114,11 @@ export default function UpdateVariantForm({
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+            <ChooseOptions
+                productAttributes={productAttributes}
+                setValue={setValue}
+                getValues={getValues}
+            />
             <UploadFile
                 setValue={setValue}
                 variantImages={activeVariant.images}

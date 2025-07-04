@@ -33,3 +33,37 @@ export async function createVariantValues(
         throw err;
     }
 }
+
+type updateVariantaValuesType = {
+    variantValues?: {
+        attributeId: number;
+        attributeValueId: number;
+    }[];
+};
+
+export async function updateVariantValues(
+    data: updateVariantaValuesType,
+    variantId: number
+) {
+    try {
+        const res = await fetch(`/api/variant-values/${variantId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            throw {
+                message: error.error || 'Failed to update variant values',
+                fieldErrors: error.errors || {},
+            };
+        }
+
+        return await res.json();
+    } catch (err) {
+        throw err;
+    }
+}

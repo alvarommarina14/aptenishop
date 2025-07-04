@@ -93,6 +93,7 @@ export default async function VariantPage({ params }: PropsType) {
 
                 <div className="col-start-1 row-start-3 lg:col-start-2 lg:row-start-2">
                     <UpdateVariantForm
+                        productAttributes={product.productAttributes}
                         productReference={product.id}
                         activeVariant={activeVariant[0]}
                     />
