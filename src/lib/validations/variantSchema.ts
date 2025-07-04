@@ -34,6 +34,14 @@ export const createVariantSchema = z.object({
     isAvailable: z.boolean().optional(),
     productId: z.number().int().positive(),
     images: z.any().optional(),
+    variantValues: z
+        .array(
+            z.object({
+                attributeId: z.number().int().positive(),
+                attributeValueId: z.number().int().positive(),
+            })
+        )
+        .optional(),
 });
 
 export const createVariantsSchema = z.union([
@@ -41,11 +49,4 @@ export const createVariantsSchema = z.union([
     z.array(createVariantSchema),
 ]);
 
-const requiredProductIdAndSKUSchema = z.object({
-    sku: z.string().nonempty('SKU is required'),
-    productId: z.number().int().positive(),
-});
-
-export const updateVariantSchema = createVariantSchema
-    .partial()
-    .merge(requiredProductIdAndSKUSchema);
+export const updateVariantSchema = createVariantSchema.partial();

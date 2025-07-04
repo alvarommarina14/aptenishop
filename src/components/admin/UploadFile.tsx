@@ -3,13 +3,13 @@ import { useRouter } from 'next/navigation';
 
 import { UseFormSetValue } from 'react-hook-form';
 import { Plus } from 'lucide-react';
-import { CreateVariantFormType, VariantImage } from '@/types';
+import { VariantImage } from '@/types';
 import { deleteVariantImages } from '@/lib/actions/variantImages';
 import Image from 'next/image';
 import { Image as ImageIcon } from 'lucide-react';
 
 type UploadFileProps = {
-    setValue: UseFormSetValue<CreateVariantFormType>;
+    setValue: UseFormSetValue<any>;
     variantImages?: VariantImage[];
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -148,8 +148,8 @@ export default function UploadFile({
                                         ? img.data.altText || ''
                                         : `preview ${index + 1}`
                                 }
-                                width={20}
-                                height={20}
+                                width={200}
+                                height={200}
                                 className="w-full h-40 object-contain rounded-md"
                             />
                             <input
@@ -163,7 +163,7 @@ export default function UploadFile({
 
                     <label
                         htmlFor="file-upload"
-                        className="h-20 w-20 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-md p-2 cursor-pointer border-dashed border-neutral-700 border"
+                        className="h-15 w-15 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-md p-2 cursor-pointer border-dashed border-neutral-700 border"
                     >
                         <Plus className="text-neutral-700 h-4 w-4" />
                     </label>

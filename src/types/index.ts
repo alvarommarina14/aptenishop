@@ -1,3 +1,9 @@
+import {
+    createVariantSchema,
+    updateVariantSchema,
+} from '@/lib/validations/variantSchema';
+import { z } from 'zod';
+
 export interface Product {
     id: number;
     name: string;
@@ -13,7 +19,7 @@ export interface Product {
 export interface Variant {
     id: number;
     sku?: string | null;
-    price?: number | null;
+    price?: number | null | string;
     compareAtPrice?: number | null;
     stock?: number | null;
     isAvailable?: boolean | null;
@@ -66,15 +72,9 @@ export interface RowData {
     [key: string]: string | ImageData | undefined;
 }
 
-export interface CreateVariantFormType {
-    sku: string;
-    price?: unknown;
-    compareAtPrice?: unknown;
-    stock?: unknown;
-    isAvailable?: boolean | undefined;
-    productId: number;
-    images?: File[] | null;
-}
+export type CreateVariantFormType = z.infer<typeof createVariantSchema>;
+
+export type UpdateVariantFormType = z.infer<typeof updateVariantSchema>;
 
 export interface CreateProductForm {
     name?: string;

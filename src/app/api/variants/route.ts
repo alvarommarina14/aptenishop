@@ -16,16 +16,30 @@ export async function POST(req: NextRequest) {
 
         if (Array.isArray(result.data)) {
             const variants = await prisma.variant.createMany({
-                data: result.data,
+                data: result.data.map(({ variantValues, ...rest }) => ({
+                    ...rest,
+                })),
                 skipDuplicates: true,
             });
+
             return NextResponse.json(variants, { status: 201 });
-        } else {
-            const variant = await prisma.variant.create({
-                data: result.data,
-            });
-            return NextResponse.json(variant, { status: 201 });
         }
+
+        const { variantValues, ...rest } = result.data;
+        const variant = await prisma.variant.create({
+            data: {
+                ...rest,
+                variantValues: variantValues
+                    ? {
+                          create: variantValues.map((vv) => ({
+                              attributeValueId: vv.attributeValueId,
+                          })),
+                      }
+                    : undefined,
+            },
+        });
+
+        return NextResponse.json(variant, { status: 201 });
     } catch (error) {
         console.error('Error creating variants:', error);
         return NextResponse.json(

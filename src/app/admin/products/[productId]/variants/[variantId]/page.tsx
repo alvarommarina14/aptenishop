@@ -22,7 +22,11 @@ export default async function VariantPage({ params }: PropsType) {
     const activeVariant = variants.filter((v) => v.id == parseInt(variantId));
 
     const titleData = {
-        title: activeVariant[0].sku ? activeVariant[0].sku : '',
+        title: activeVariant
+            ? activeVariant[0].variantValues
+                  .map((vv) => vv.attributeValue.value)
+                  .join(' / ')
+            : '',
         icon: Tag,
     };
 
@@ -44,7 +48,7 @@ export default async function VariantPage({ params }: PropsType) {
                                 alt={
                                     activeVariant[0].images[0]?.altText ||
                                     '/placeholder.png'
-                                } //TODO: add placeholder image
+                                }
                                 width={120}
                                 height={120}
                                 className="rounded object-cover border border-neutral-200"
@@ -72,12 +76,16 @@ export default async function VariantPage({ params }: PropsType) {
                                     <Image
                                         src={variant.images[0].url}
                                         alt={variant.images[0].altText || ''}
-                                        width={20}
-                                        height={20}
+                                        width={200}
+                                        height={200}
                                         className="h-12 w-12 rounded object-cover border border-neutral-200"
                                     />
                                 )}
-                                {variant.sku}
+                                <span>
+                                    {variant.variantValues
+                                        .map((vv) => vv.attributeValue.value)
+                                        .join(' / ')}
+                                </span>
                             </Link>
                         ))}
                     </div>
@@ -85,6 +93,7 @@ export default async function VariantPage({ params }: PropsType) {
 
                 <div className="col-start-1 row-start-3 lg:col-start-2 lg:row-start-2">
                     <UpdateVariantForm
+                        productAttributes={product.productAttributes}
                         productReference={product.id}
                         activeVariant={activeVariant[0]}
                     />

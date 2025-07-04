@@ -1,4 +1,4 @@
-import { CreateVariantFormType } from '@/types';
+import { CreateVariantFormType, UpdateVariantFormType } from '@/types';
 
 export async function createVariant(data: CreateVariantFormType) {
     try {
@@ -25,7 +25,7 @@ export async function createVariant(data: CreateVariantFormType) {
     }
 }
 
-export async function updateVariant(data: CreateVariantFormType, id: number) {
+export async function updateVariant(data: UpdateVariantFormType, id: number) {
     try {
         const res = await fetch(`/api/variants/${id}`, {
             method: 'PUT',

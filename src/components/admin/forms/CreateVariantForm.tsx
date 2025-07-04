@@ -1,45 +1,55 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle, CircleAlert } from 'lucide-react';
 
-import { CreateVariantFormType } from '@/types';
+import { CreateVariantFormType, ProductAttribute, Variant } from '@/types';
 import { uploadImagesToCloudinary } from '@/lib/actions/cloudinary';
 import { createVariantImages } from '@/lib/actions/variantImages';
 import { createVariant } from '@/lib/actions/variants';
+import { createVariantValues } from '@/lib/actions/variantValues';
 import { createVariantSchema } from '@/lib/validations/variantSchema';
 
 import UploadFile from '@/components/admin/UploadFile';
+import ChooseOptions from '@/components/admin/ChooseOptions';
 
 type PropsType = {
-    productReference: { productId: string };
+    productReference: number;
+    productAttributes: ProductAttribute[] | undefined;
 };
 
-export default function CreateVariantForm({ productReference }: PropsType) {
+export default function CreateVariantForm({
+    productReference,
+    productAttributes = [],
+}: PropsType) {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const {
         register,
         setValue,
+        getValues,
         handleSubmit,
         formState: { errors },
-    } = useForm<CreateVariantFormType>({
+    } = useForm({
         resolver: zodResolver(createVariantSchema),
+        defaultValues: {
+            productId: productReference,
+            variantValues: productAttributes.map((attr) => ({
+                attributeId: attr.id,
+                attributeValueId: attr.attributeValues[0]?.id ?? 0,
+            })),
+        },
     });
-    useEffect(() => {
-        if (productReference?.productId) {
-            setValue('productId', parseInt(productReference.productId));
-        }
-    }, [productReference, setValue]);
 
     const onSubmit = async (data: CreateVariantFormType) => {
         setIsLoading(true);
-        const { images, ...restData } = data;
+        const { images, variantValues, ...restData } = data;
+
         try {
             const files = images ? (images as File[]) : null;
             const uploadedImages = await uploadImagesToCloudinary(files);
@@ -47,21 +57,23 @@ export default function CreateVariantForm({ productReference }: PropsType) {
                 ...restData,
                 isAvailable:
                     typeof data.stock == 'number' ? data.stock > 0 : false,
-                productId: parseInt(productReference.productId),
             };
-            const variant = await createVariant(dataCompleted);
+            const variant: Variant = await createVariant(dataCompleted);
+            const newArray = variantValues?.map(({ attributeValueId }) => ({
+                attributeValueId,
+                variantId: variant.id,
+            }));
+            await createVariantValues(newArray);
             const imagesFormatted = uploadedImages?.map((img) => ({
                 url: img.url,
                 publicId: img.publicId,
-                variantId: parseInt(variant.id),
+                variantId: variant.id,
             }));
-
             if (imagesFormatted?.length) {
                 await createVariantImages(imagesFormatted);
             }
-
             router.push(
-                `/admin/products/${productReference.productId}/variants/${variant.id}`
+                `/admin/products/${productReference}/variants/${variant.id}`
             );
         } catch (error) {
             setIsLoading(false);
@@ -70,7 +82,15 @@ export default function CreateVariantForm({ productReference }: PropsType) {
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-4 mt-4"
+        >
+            <ChooseOptions
+                productAttributes={productAttributes}
+                setValue={setValue}
+                getValues={getValues}
+            />
             <UploadFile setValue={setValue} setIsLoading={setIsLoading} />
             <div className="bg-white p-4 rounded-xl shadow-sm">
                 <h2 className="font-semibold mb-2">Pricing</h2>
@@ -96,7 +116,7 @@ export default function CreateVariantForm({ productReference }: PropsType) {
                             />
                         </div>
                         {errors.price && (
-                            <p className="text-red-500 text-sm">
+                            <p className="text-red-700 text-sm">
                                 {errors.price.message}
                             </p>
                         )}
@@ -125,7 +145,7 @@ export default function CreateVariantForm({ productReference }: PropsType) {
                             />
                         </div>
                         {errors.compareAtPrice && (
-                            <p className="text-red-500 text-sm">
+                            <p className="text-red-700 text-sm">
                                 {errors.compareAtPrice.message}
                             </p>
                         )}
@@ -149,7 +169,7 @@ export default function CreateVariantForm({ productReference }: PropsType) {
                         className="border rounded-md border-neutral-500 text-sm p-2 pl-3 "
                     />
                     {errors.sku && (
-                        <p className="text-red-500 text-sm">
+                        <p className="text-red-700 text-sm">
                             {errors.sku.message}
                         </p>
                     )}
@@ -167,7 +187,7 @@ export default function CreateVariantForm({ productReference }: PropsType) {
                         className="border rounded-md border-neutral-500 text-sm p-2 pl-3"
                     />
                     {errors.stock && (
-                        <p className="text-red-500 text-sm">
+                        <p className="text-red-700 text-sm">
                             {errors.stock.message}
                         </p>
                     )}
